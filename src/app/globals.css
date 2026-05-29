@@ -1,0 +1,326 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FFFFFF; /* White Canvas Background */
+  --foreground: #0A0A0A; /* Black Typography */
+  
+  --zinc-50: #FFFFFF;
+  --zinc-100: #F8F7F3; /* Warm Off-white canvas contrast */
+  --zinc-200: #F1EFE9; /* Warm Off-white secondary card */
+  --zinc-300: #D9D9D6; /* Stone/Grey */
+  --zinc-450: #9C9C9C;
+  --zinc-500: #71717A;
+  --zinc-600: #525252; /* Muted Text */
+  --zinc-700: #3F3F46;
+  --zinc-800: #27272A;
+  --zinc-850: #E5E7EB; /* Neutral gray borders */
+  --zinc-900: #1F2937; /* Charcoal */
+  --zinc-950: #0A0A0A; /* Black */
+  
+  --color-black-val: #0A0A0A;
+  --color-white-val: #ffffff;
+  
+  /* Semantic Tokens for Brand and Status in Light / Brand Mode */
+  --brand-navy: #0A0A0A;
+  --brand-blue: #1D4ED8; /* Premium Accent Blue */
+  --brand-cyan: #2563EB;
+  --surface-light: #FFFFFF;
+  --surface-muted: #F8F7F3;
+  --surface-dark: #0A0A0A;
+  --border-brand: #D9D9D6;
+  --status-success: #16A34A;
+  --status-caution: #D97706;
+  --status-danger: #DC2626;
+}
+
+.dark, [data-theme="dark"] {
+  --background: #07111F; /* Calm Navy Canvas Background */
+  --foreground: #E2E8F0; /* Soft Slate Text */
+  
+  --zinc-50: #07111F; /* Calm Navy Background */
+  --zinc-100: #0D1B2E; /* Navy Card Background */
+  --zinc-200: #11223F; /* Navy Card Border */
+  --zinc-300: #1A2F4C; /* Calm Navy-Slate Border */
+  --zinc-400: #334155;
+  --zinc-500: #475569;
+  --zinc-600: #64748B;
+  --zinc-700: #94A3B8;
+  --zinc-800: #CBD5E1;
+  --zinc-850: #E2E8F0;
+  --zinc-900: #E2E8F0;
+  --zinc-950: #FFFFFF;
+  
+  --color-black-val: #07111F;
+  --color-white-val: #ffffff;
+  
+  /* Semantic Tokens for Brand and Status in Dark / Performance Mode */
+  --brand-navy: #0D1B2E;
+  --brand-blue: #2563EB;
+  --brand-cyan: #3B82F6;
+  --surface-light: #11223F;
+  --surface-muted: #0D1B2E;
+  --surface-dark: #07111F;
+  --border-brand: #1A2F4C;
+  --status-success: #16A34A;
+  --status-caution: #D97706;
+  --status-danger: #DC2626;
+}
+
+.performance, [data-theme="performance"] {
+  --background: #0A0A0A;
+  --foreground: #F9FAFB;
+  
+  --zinc-50: #ffffff;
+  --zinc-100: #ffffff;
+  --zinc-200: #cbd5e1;
+  --zinc-300: #94a3b8;
+  --zinc-400: #2563EB;
+  --zinc-500: #2563EB;
+  --zinc-600: #ffffff;
+  --zinc-700: #2563EB;
+  --zinc-800: #ffffff;
+  --zinc-850: #000000;
+  --zinc-900: #000000;
+  --zinc-950: #000000;
+  
+  --color-black-val: #000000;
+  --color-white-val: #ffffff;
+  
+  /* Semantic Tokens for Brand and Status in High-Contrast Mode */
+  --brand-navy: #FFFFFF;
+  --brand-blue: #2563EB;
+  --brand-cyan: #2563EB;
+  --surface-light: #FFFFFF;
+  --surface-muted: #111827;
+  --surface-dark: #0A0A0A;
+  --border-brand: #374151;
+  --status-success: #16A34A;
+  --status-caution: #D97706;
+  --status-danger: #DC2626;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --color-zinc-50: var(--zinc-50);
+  --color-zinc-100: var(--zinc-100);
+  --color-zinc-200: var(--zinc-200);
+  --color-zinc-300: var(--zinc-300);
+  --color-zinc-400: var(--zinc-400);
+  --color-zinc-500: var(--zinc-500);
+  --color-zinc-600: var(--zinc-600);
+  --color-zinc-700: var(--zinc-700);
+  --color-zinc-800: var(--zinc-800);
+  --color-zinc-850: var(--zinc-850);
+  --color-zinc-900: var(--zinc-900);
+  --color-zinc-950: var(--zinc-950);
+
+  --color-slate-50: var(--zinc-50);
+  --color-slate-100: var(--zinc-100);
+  --color-slate-200: var(--zinc-200);
+  --color-slate-300: var(--zinc-300);
+  --color-slate-400: var(--zinc-400);
+  --color-slate-500: var(--zinc-500);
+  --color-slate-600: var(--zinc-600);
+  --color-slate-700: var(--zinc-700);
+  --color-slate-800: var(--zinc-800);
+  --color-slate-850: var(--zinc-850);
+  --color-slate-900: var(--zinc-900);
+  --color-slate-950: var(--zinc-950);
+
+  --color-gray-50: var(--zinc-50);
+  --color-gray-100: var(--zinc-100);
+  --color-gray-200: var(--zinc-200);
+  --color-gray-300: var(--zinc-300);
+  --color-gray-400: var(--zinc-400);
+  --color-gray-500: var(--zinc-500);
+  --color-gray-600: var(--zinc-600);
+  --color-gray-700: var(--zinc-700);
+  --color-gray-800: var(--zinc-800);
+  --color-gray-850: var(--zinc-850);
+  --color-gray-900: var(--zinc-900);
+  --color-gray-950: var(--zinc-950);
+
+  --color-black: var(--color-black-val);
+  --color-white: var(--color-white-val);
+  
+  /* Semantic bindings registered in Tailwind */
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-cyan: var(--brand-cyan);
+  --color-surface-light: var(--surface-light);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-dark: var(--surface-dark);
+  --color-border-brand: var(--border-brand);
+  --color-status-success: var(--status-success);
+  --color-status-caution: var(--status-caution);
+  --color-status-danger: var(--status-danger);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  text-rendering: optimizeLegibility;
+}
+
+.platform-shell {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(248, 250, 252, 0.96)),
+    #F8FAFC;
+}
+
+.platform-shell main {
+  background: transparent;
+}
+
+.platform-shell h1 {
+  text-transform: none;
+  letter-spacing: 0;
+  color: #111827;
+  font-weight: 800;
+  line-height: 1.08;
+}
+
+.platform-shell h2,
+.platform-shell h3,
+.platform-shell h4 {
+  letter-spacing: 0;
+}
+
+.platform-shell p,
+.platform-shell span,
+.platform-shell label,
+.platform-shell button,
+.platform-shell a,
+.platform-shell td,
+.platform-shell th,
+.platform-shell input,
+.platform-shell select,
+.platform-shell textarea {
+  letter-spacing: 0;
+}
+
+.platform-shell .rounded-2xl,
+.platform-shell .rounded-3xl {
+  border-radius: 8px;
+}
+
+.platform-shell .rounded-xl {
+  border-radius: 8px;
+}
+
+.platform-shell [class*="bg-zinc-50"],
+.platform-shell [class*="bg-zinc-55"] {
+  background-color: #FFFFFF;
+}
+
+.platform-shell [class*="border-zinc-200"],
+.platform-shell [class*="border-zinc-300"] {
+  border-color: #E5E7EB;
+}
+
+.platform-shell .shadow-2xl,
+.platform-shell .shadow-xl,
+.platform-shell .shadow-lg,
+.platform-shell .shadow-md,
+.platform-shell .shadow {
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04), 0 14px 34px rgba(17, 24, 39, 0.07);
+}
+
+.platform-shell [class*="shadow-brand-blue"],
+.platform-shell [class*="shadow-rose"],
+.platform-shell [class*="shadow-amber"] {
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.06);
+}
+
+.platform-shell .animate-pulse,
+.platform-shell .animate-ping,
+.platform-shell .animate-bounce,
+.platform-shell .animate-spin {
+  animation: none;
+}
+
+.platform-shell [class*="blur-3xl"],
+.platform-shell [class*="blur-xl"],
+.platform-shell [class*="bg-radial"] {
+  display: none;
+}
+
+.platform-shell [class*="bg-gradient-to-r"],
+.platform-shell [class*="bg-gradient-to-br"],
+.platform-shell [class*="bg-gradient-to-b"] {
+  background-image: none;
+}
+
+.platform-shell table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+}
+
+.platform-shell th {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6B7280;
+  background: #F8FAFC;
+  text-transform: none;
+}
+
+.platform-shell td {
+  color: #374151;
+  border-color: #EEF2F7;
+}
+
+.platform-shell .platform-field {
+  background:
+    linear-gradient(90deg, rgba(22, 101, 52, 0.035) 50%, rgba(22, 101, 52, 0.065) 50%),
+    #F4F7F1;
+  background-size: 18% 100%;
+}
+
+.platform-shell .platform-field svg {
+  color: #C8D1C3;
+  stroke-width: 0.42;
+}
+
+.platform-shell .platform-player-marker {
+  height: 30px;
+  width: 30px;
+  font-size: 9px;
+  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.16);
+}
+
+.platform-shell .platform-metric-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04);
+}
+
+.platform-shell input,
+.platform-shell select,
+.platform-shell textarea {
+  background: #FFFFFF;
+  border-color: #D1D5DB;
+  color: #111827;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.platform-shell input:focus,
+.platform-shell select:focus,
+.platform-shell textarea:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+.dark .platform-shell,
+.performance .platform-shell {
+  background: #111827;
+}
+
+.dark .platform-shell h1,
+.performance .platform-shell h1 {
+  color: #F9FAFB;
+}
