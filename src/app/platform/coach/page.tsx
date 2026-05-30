@@ -3,6 +3,7 @@
 import * as React from 'react';
 import * as Icons from 'lucide-react';
 import Link from 'next/link';
+import ClientOnly from '@/components/performance/ClientOnly';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -175,8 +176,9 @@ export default function CoachOverviewPage() {
             </div>
             
             <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={workloadTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <ClientOnly>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={workloadTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorLoad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="var(--brand-blue)" stopOpacity={0.2} />
@@ -239,8 +241,9 @@ export default function CoachOverviewPage() {
                     fillOpacity={1} 
                     fill="url(#colorIntensity)" 
                   />
-                </AreaChart>
-              </ResponsiveContainer>
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ClientOnly>
             </div>
           </div>
 

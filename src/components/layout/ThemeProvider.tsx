@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 export type Theme = 'light' | 'dark' | 'performance';
 
@@ -20,7 +20,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     try {
       const savedTheme = localStorage.getItem('ssp-theme') as Theme;
       if (savedTheme && ['light', 'dark', 'performance'].includes(savedTheme)) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setThemeState(savedTheme);
       }
     } catch (e) {
@@ -29,14 +28,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
-  const setTheme = (newTheme: Theme) => {
+  const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme);
     try {
       localStorage.setItem('ssp-theme', newTheme);
     } catch (e) {
       console.warn('LocalStorage is disabled or unavailable:', e);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (!mounted) return;
@@ -57,8 +56,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.setAttribute('data-theme', theme);
   }, [theme, mounted]);
 
+  const value = useMemo(() => ({ theme, setTheme }), [theme, setTheme]);
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

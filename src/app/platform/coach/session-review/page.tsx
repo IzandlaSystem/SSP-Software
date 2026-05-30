@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import * as Icons from 'lucide-react';
+import ClientOnly from '@/components/performance/ClientOnly';
 import {
   ResponsiveContainer,
   RadarChart,
@@ -218,8 +219,9 @@ export default function SessionReviewPage() {
             </div>
 
             <div className="h-72 w-full flex items-center justify-center">
-              <RechartsResponsiveContainer width="100%" height="100%">
-                <RechartsRadarChart cx="50%" cy="50%" outerRadius="80%" data={radarComparisonData}>
+              <ClientOnly>
+                <RechartsResponsiveContainer width="100%" height="100%">
+                  <RechartsRadarChart cx="50%" cy="50%" outerRadius="80%" data={radarComparisonData}>
                   <RechartsPolarGrid stroke="#27272a" />
                   <RechartsPolarAngleAxis 
                     dataKey="metric" 
@@ -266,8 +268,9 @@ export default function SessionReviewPage() {
                       paddingTop: '10px' 
                     }} 
                   />
-                </RechartsRadarChart>
-              </RechartsResponsiveContainer>
+                  </RechartsRadarChart>
+                </RechartsResponsiveContainer>
+              </ClientOnly>
             </div>
           </div>
 

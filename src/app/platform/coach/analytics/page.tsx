@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import * as Icons from 'lucide-react';
+import ClientOnly from '@/components/performance/ClientOnly';
 import {
   ResponsiveContainer,
   ScatterChart,
@@ -137,8 +138,9 @@ export default function AnalyticsPage() {
         </div>
 
         <div className="h-96 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: -20 }}>
+          <ClientOnly>
+            <ResponsiveContainer width="100%" height="100%">
+              <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: -20 }}>
               <CartesianGrid stroke="#27272a" strokeDasharray="3 3" vertical={false} />
               <XAxis 
                 type="number" 
@@ -191,8 +193,9 @@ export default function AnalyticsPage() {
                   />
                 ))}
               </Scatter>
-            </ScatterChart>
-          </ResponsiveContainer>
+              </ScatterChart>
+            </ResponsiveContainer>
+          </ClientOnly>
         </div>
 
         <div className="mt-6 pt-4 border-t border-zinc-300 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-zinc-500">

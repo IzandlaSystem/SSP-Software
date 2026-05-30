@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { Activity, ArrowUpRight, Mail } from 'lucide-react';
 

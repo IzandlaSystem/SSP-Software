@@ -30,6 +30,7 @@ export default function LiveSessionOverviewPage() {
   const [workloadStrain, setworkloadStrain] = React.useState<number>(0);
   const [maxSpeed, setMaxSpeed] = React.useState<number>(0);
   const [devicePaired, setDevicePaired] = React.useState<boolean>(false);
+  const latestSpeedRef = React.useRef(0);
 
   // Check hardware pairing on load
   React.useEffect(() => {
@@ -61,12 +62,12 @@ export default function LiveSessionOverviewPage() {
           currentVelocity = parseFloat((6 + Math.random() * 2.5).toFixed(1));
         }
 
+        const previousVelocity = latestSpeedRef.current;
+        latestSpeedRef.current = currentVelocity;
         setSpeed(currentVelocity);
 
         // Keep track of maximum velocity
-        if (currentVelocity > maxSpeed) {
-          setMaxSpeed(currentVelocity);
-        }
+        setMaxSpeed((previousMax) => Math.max(previousMax, currentVelocity));
 
         // Check if velocity qualifies as high-intensity sprint (> 6.5 m/s)
         if (currentVelocity > 6.5) {
@@ -81,7 +82,7 @@ export default function LiveSessionOverviewPage() {
 
         // Increment workload strain based on Performance workload forces
         // Sudden velocity changes represent higher structural workload loads
-        const changeFactor = Math.abs(currentVelocity - speed) * 1.5;
+        const changeFactor = Math.abs(currentVelocity - previousVelocity) * 1.5;
         const baselineStrain = currentVelocity * 0.15;
         setworkloadStrain(m => parseFloat((m + baselineStrain + changeFactor).toFixed(1)));
 
@@ -91,7 +92,7 @@ export default function LiveSessionOverviewPage() {
     }
 
     return () => clearInterval(interval);
-  }, [isActive, isPaused, speed, maxSpeed]);
+  }, [isActive, isPaused]);
 
   // Format seconds to MM:SS
   const formatTime = (totalSeconds: number) => {

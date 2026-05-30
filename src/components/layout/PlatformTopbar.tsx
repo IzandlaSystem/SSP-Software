@@ -174,6 +174,8 @@ export default function PlatformTopbar({ role, onMenuClick }: PlatformTopbarProp
           <div className="relative" ref={themeRef}>
             <button
               onClick={() => setThemeOpen(!themeOpen)}
+              aria-label="Change theme"
+              aria-expanded={themeOpen}
               className={`p-2 rounded-xl flex items-center justify-center transition-all ${
                 themeOpen ? 'bg-zinc-100 dark:bg-zinc-800 text-brand-blue' : 'text-zinc-400 hover:text-zinc-850 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900'
               }`}

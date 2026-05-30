@@ -4,35 +4,35 @@ import * as React from 'react';
 import { Sun, Moon, Zap } from 'lucide-react';
 import { useTheme, Theme } from './ThemeProvider';
 
+const options = [
+  {
+    id: 'light' as Theme,
+    label: 'Light',
+    desc: 'Client-ready sports operations mode',
+    icon: Sun,
+    activeColor: 'bg-brand-blue/10 text-brand-blue border-brand-blue/30',
+    activeText: 'text-brand-blue',
+  },
+  {
+    id: 'dark' as Theme,
+    label: 'Dark',
+    desc: 'Calm performance mode',
+    icon: Moon,
+    activeColor: 'bg-brand-blue/15 text-brand-blue border-brand-blue/30',
+    activeText: 'text-brand-blue',
+  },
+  {
+    id: 'performance' as Theme,
+    label: 'Contrast',
+    desc: 'Sunlight-legible field-side view',
+    icon: Zap,
+    activeColor: 'bg-brand-blue text-black border-brand-blue font-extrabold',
+    activeText: 'text-brand-blue',
+  },
+];
+
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-
-  const options = [
-    {
-      id: 'light' as Theme,
-      label: 'Light',
-      desc: 'Client-ready sports operations mode',
-      icon: Sun,
-      activeColor: 'bg-brand-blue/10 text-brand-blue border-brand-blue/30',
-      activeText: 'text-brand-blue',
-    },
-    {
-      id: 'dark' as Theme,
-      label: 'Dark',
-      desc: 'Calm performance mode',
-      icon: Moon,
-      activeColor: 'bg-brand-blue/15 text-brand-blue border-brand-blue/30',
-      activeText: 'text-brand-blue',
-    },
-    {
-      id: 'performance' as Theme,
-      label: 'Contrast',
-      desc: 'Sunlight-legible field-side view',
-      icon: Zap,
-      activeColor: 'bg-brand-blue text-black border-brand-blue font-extrabold',
-      activeText: 'text-brand-blue',
-    },
-  ];
 
   return (
     <div className="flex flex-col space-y-2.5 p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg backdrop-blur-md max-w-sm w-full transition-all shadow-xl">
@@ -54,6 +54,7 @@ export default function ThemeToggle() {
             <button
               key={opt.id}
               onClick={() => setTheme(opt.id)}
+              aria-pressed={isActive}
               className={`flex flex-col items-center justify-center py-3 px-1 rounded-xl border text-center transition-all cursor-pointer select-none group focus:outline-none focus:ring-2 focus:ring-zinc-700 ${
                 isActive
                   ? opt.activeColor

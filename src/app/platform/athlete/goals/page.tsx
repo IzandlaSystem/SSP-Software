@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import ClientOnly from '@/components/performance/ClientOnly';
 import { 
   ArrowLeft, 
   Target, 
@@ -190,8 +191,9 @@ export default function GoalsPage() {
         </div>
 
         <div className="h-72 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
+          <ClientOnly>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
               data={weeklyTrends}
               margin={{ top: 20, right: 10, left: -20, bottom: 0 }}
             >
@@ -234,8 +236,9 @@ export default function GoalsPage() {
               />
               <Bar dataKey="loads" fill="#155EEF" name="Logged Load Strain" radius={[4, 4, 0, 0]} maxBarSize={30} />
               <Bar dataKey="targetLoads" fill="#27272a" stroke="#155EEF" strokeWidth={1} name="Load Targets" radius={[4, 4, 0, 0]} maxBarSize={30} />
-            </BarChart>
-          </ResponsiveContainer>
+              </BarChart>
+            </ResponsiveContainer>
+          </ClientOnly>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ClientOnly from '@/components/performance/ClientOnly';
 
 import { 
   ArrowLeft as ArrowLeftIcon, 
@@ -203,8 +204,9 @@ export default function PostSessionReviewPage() {
           </div>
 
           <div className="h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
+            <ClientOnly>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
                 data={chartData}
                 margin={{ top: 20, right: 10, left: -20, bottom: 0 }}
                 barGap={8}
@@ -248,8 +250,9 @@ export default function PostSessionReviewPage() {
                 />
                 <Bar dataKey="actual" fill="#3b82f6" name="Logged Actuals" radius={[4, 4, 0, 0]} maxBarSize={45} />
                 <Bar dataKey="target" fill="#27272a" stroke="#155EEF" strokeWidth={1} name="Coach Targets" radius={[4, 4, 0, 0]} maxBarSize={45} />
-              </BarChart>
-            </ResponsiveContainer>
+                </BarChart>
+              </ResponsiveContainer>
+            </ClientOnly>
           </div>
         </div>
 

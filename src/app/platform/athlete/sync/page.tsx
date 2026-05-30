@@ -19,9 +19,10 @@ import {
 export default function SessionSyncPage() {
   const [syncing, setSyncing] = React.useState<boolean>(false);
   const [progress, setProgress] = React.useState<number>(0);
-  const [step, setStep] = React.useState<string>('Pending');
   const [statusText, setStatusText] = React.useState<string>('Local session queued. Ready to sync.');
   const [success, setSuccess] = React.useState<boolean>(false);
+  const timersRef = React.useRef<ReturnType<typeof setTimeout>[]>([]);
+  const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Unsynced sessions queue
   const [packets, setPackets] = React.useState<any[]>([
@@ -30,6 +31,7 @@ export default function SessionSyncPage() {
   ]);
 
   React.useEffect(() => {
+    const timers = timersRef.current;
     // Check if there's a custom session logged from the live simulator
     const unsyncedSession = localStorage.getItem('ssp-unsynced-session');
     if (unsyncedSession) {
@@ -42,29 +44,32 @@ export default function SessionSyncPage() {
           type: 'Live session data',
           timestamp: parsed.timestamp
         };
-        setPackets([customPacket, ...packets]);
+        setPackets((currentPackets) => [customPacket, ...currentPackets]);
       } catch (e) {
         console.error(e);
       }
     }
+    return () => {
+      timers.forEach(clearTimeout);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, []);
 
   const startSessionSync = () => {
     setSyncing(true);
     setSuccess(false);
     setProgress(0);
-    setStep('Connecting');
     setStatusText('Connecting to paired SSP tracker...');
 
     // Progress animation for session file upload
-    setTimeout(() => {
-      setStep('Syncing');
+    const startTimer = setTimeout(() => {
       setStatusText('Connection ready. Uploading session files...');
       
-      const interval = setInterval(() => {
+      intervalRef.current = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 100) {
-            clearInterval(interval);
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            intervalRef.current = null;
             finalizeSync();
             return 100;
           }
@@ -72,27 +77,26 @@ export default function SessionSyncPage() {
         });
       }, 150);
     }, 1500);
+    timersRef.current.push(startTimer);
   };
 
   const finalizeSync = () => {
-    setStep('Finalizing');
     setStatusText('Finalizing session upload...');
 
-    setTimeout(() => {
+    const finalizeTimer = setTimeout(() => {
       setSyncing(false);
       setSuccess(true);
-      setStep('Completed');
       setStatusText('Sync complete.');
       setPackets([]);
       
       // Clear unsynced items from storage
       localStorage.removeItem('ssp-unsynced-session');
     }, 1500);
+    timersRef.current.push(finalizeTimer);
   };
 
   const generateMockPacket = () => {
     setSuccess(false);
-    setStep('Pending');
     setStatusText('Local session queued. Ready to sync.');
     setPackets([
       { id: Date.now().toString(), name: `Session ${new Date().toLocaleDateString('en-GB')}`, size: '10.8 MB', type: 'Session movement file', timestamp: new Date().toISOString() }

@@ -23,6 +23,8 @@ export default function DevicePairingPage() {
   const [discovered, setDiscovered] = React.useState<boolean>(false);
   
   const [batteryLevel] = React.useState<number>(98);
+  const scanTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const connectTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sync state on load
   React.useEffect(() => {
@@ -31,6 +33,11 @@ export default function DevicePairingPage() {
     if (isPaired) {
       setDiscovered(true);
     }
+
+    return () => {
+      if (scanTimerRef.current) clearTimeout(scanTimerRef.current);
+      if (connectTimerRef.current) clearTimeout(connectTimerRef.current);
+    };
   }, []);
 
   // Simulator Actions
@@ -40,7 +47,8 @@ export default function DevicePairingPage() {
     setPaired(false);
     
     // Discovered after 3 seconds of scanning
-    setTimeout(() => {
+    if (scanTimerRef.current) clearTimeout(scanTimerRef.current);
+    scanTimerRef.current = setTimeout(() => {
       setScanning(false);
       setDiscovered(true);
     }, 3000);
@@ -50,7 +58,8 @@ export default function DevicePairingPage() {
     setConnecting(true);
     
     // Connects after 2.5 seconds
-    setTimeout(() => {
+    if (connectTimerRef.current) clearTimeout(connectTimerRef.current);
+    connectTimerRef.current = setTimeout(() => {
       setConnecting(false);
       setPaired(true);
       

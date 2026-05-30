@@ -3,6 +3,7 @@
 import * as React from 'react';
 import * as Icons from 'lucide-react';
 import Link from 'next/link';
+import ClientOnly from '@/components/performance/ClientOnly';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -241,8 +242,9 @@ export default function AthleteDetailPage({ params }: PageProps) {
           </div>
 
           <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyWorkloadData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <ClientOnly>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weeklyWorkloadData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid stroke="#27272a" strokeDasharray="3 3" vertical={false} />
                 <XAxis 
                   dataKey="day" 
@@ -294,8 +296,9 @@ export default function AthleteDetailPage({ params }: PageProps) {
                   strokeWidth={2.5} 
                   dot={{ r: 3 }} 
                 />
-              </BarChart>
-            </ResponsiveContainer>
+                </BarChart>
+              </ResponsiveContainer>
+            </ClientOnly>
           </div>
         </div>
 
@@ -314,8 +317,9 @@ export default function AthleteDetailPage({ params }: PageProps) {
           </div>
 
           <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={acwrTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <ClientOnly>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={acwrTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid stroke="#27272a" strokeDasharray="3 3" vertical={false} />
                 <XAxis 
                   dataKey="date" 
@@ -356,8 +360,9 @@ export default function AthleteDetailPage({ params }: PageProps) {
                   dot={{ r: 4 }} 
                   activeDot={{ r: 6 }}
                 />
-              </LineChart>
-            </ResponsiveContainer>
+                </LineChart>
+              </ResponsiveContainer>
+            </ClientOnly>
           </div>
         </div>
 
