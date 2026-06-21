@@ -4,9 +4,9 @@ import { Activity, ArrowRight, BarChart3, CheckCircle2, Cpu, LineChart, Route, S
 
 export const marketingPalette = {
   ink: '#0A0A0A',
-  graphite: '#802301',
-  offWhite: '#f7efef',
-  border: '#e5ebe5',
+  graphite: '#1F2937',
+  offWhite: '#F7F5EF',
+  border: '#E5E7EB',
   blue: '#2563EB',
   lime: '#D7FF3F',
 };
@@ -179,7 +179,7 @@ export const audienceFeatures = [
 
 export function SportsCampaignHero() {
   return (
-    <section className="bg-[#802301] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+    <section className="bg-[#F7F5EF] px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
       <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[0.92fr_1.08fr]">
         <div className="space-y-7">
           <Pill>SSP performance technology</Pill>
