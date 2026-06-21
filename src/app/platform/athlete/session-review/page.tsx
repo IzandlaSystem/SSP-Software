@@ -7,16 +7,11 @@ import ClientOnly from '@/components/performance/ClientOnly';
 
 import { 
   ArrowLeft as ArrowLeftIcon, 
-  Calendar as CalendarIcon, 
-  Clock as ClockIcon, 
-  Compass as CompassIcon, 
-  Zap as ZapIcon, 
   Activity as ActivityIcon, 
   Sliders as SlidersIcon, 
   Save as SaveIcon, 
   CheckCircle as CheckCircleIcon,
-  RefreshCw as RefreshCwIcon,
-  Info as InfoIcon
+  RefreshCw as RefreshCwIcon
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -28,6 +23,7 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
+import { DEMO_ATHLETE_ID, getActiveSessionForAthlete, getTargetForAthlete } from '@/data';
 
 export default function PostSessionReviewPage() {
   const router = useRouter();
@@ -52,6 +48,11 @@ export default function PostSessionReviewPage() {
   const [syncing, setSyncing] = React.useState<boolean>(false);
   const [syncStep, setSyncStep] = React.useState<string>('');
   const [success, setSuccess] = React.useState<boolean>(false);
+  const [activeConfig, setActiveConfig] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    router.prefetch('/platform/athlete/history');
+  }, [router]);
 
   React.useEffect(() => {
     const lastSessionStr = localStorage.getItem('ssp-last-session');
@@ -62,6 +63,11 @@ export default function PostSessionReviewPage() {
         console.error(e);
       }
     }
+    try {
+      setActiveConfig(getActiveSessionForAthlete(DEMO_ATHLETE_ID));
+    } catch {
+      setActiveConfig(null);
+    }
   }, []);
 
   // Format MM:SS for display
@@ -71,26 +77,33 @@ export default function PostSessionReviewPage() {
     return `${mins}m ${secs}s`;
   };
 
-  // Recharts target thresholds comparison data
-  // Since units differ, we normalize to target percentage (100 = target)
+  const isAssigned = !!(activeConfig && activeConfig.selectedPlayerIds?.includes(DEMO_ATHLETE_ID));
+  const activeTarget = getTargetForAthlete(isAssigned ? activeConfig : null, DEMO_ATHLETE_ID);
+
   const chartData = [
     {
       metric: 'Distance',
       actual: parseFloat(session.distance),
-      target: 5.5, // Coach set 5.5km
+      target: activeTarget.distanceMeters / 1000,
       unit: 'km'
     },
     {
       metric: 'Peak Velocity',
       actual: parseFloat(session.maxSpeed),
-      target: 8.0, // Coach set 8.0 m/s
+      target: activeTarget.maxSpeedMps,
       unit: 'm/s'
     },
     {
-      metric: 'Sprint Reps',
+      metric: 'Sprint Efforts',
       actual: session.sprints,
-      target: 15, // Coach set 15 sprints
-      unit: 'reps'
+      target: activeTarget.sprintCount,
+      unit: 'efforts'
+    },
+    {
+      metric: 'Workload Index',
+      actual: Number(session.strain || 0),
+      target: activeTarget.workloadIndex,
+      unit: 'index'
     }
   ];
 
@@ -109,7 +122,7 @@ export default function PostSessionReviewPage() {
         
         // Simulate step 3
         setTimeout(() => {
-          setSyncStep('Saving post-session readiness summary...');
+          setSyncStep('Saving post-session preparation summary...');
           
           // Successful save
           setTimeout(() => {
@@ -119,11 +132,12 @@ export default function PostSessionReviewPage() {
             // Push to historical logs array in localStorage
             const newLog = {
               date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-              type: 'Pitch Conditioning',
+              type: isAssigned && activeConfig?.sessionType === 'match' ? 'Match' : 'Training',
               distance: `${session.distance} km`,
               maxSpeed: `${session.maxSpeed} m/s`,
               sprints: session.sprints,
               strain: session.strain,
+              target: activeTarget,
               readinessScore: Math.round(((11 - trainingloadBalanceScale) + workload + (11 - loadBalance) + (11 - availability)) * 2.5), // Readiness Score out of 100
               intensity: session.sprints > 10 ? 'High' : 'Medium'
             };
@@ -262,19 +276,19 @@ export default function PostSessionReviewPage() {
             <div className="border-b border-zinc-300 pb-3">
               <h3 className="font-extrabold text-sm text-zinc-800 flex items-center space-x-2">
                 <SlidersIcon className="h-4.5 w-4.5 text-brand-blue" />
-                <span>session preparation</span>
+                <span>Perceived Session Preparation Check-In</span>
               </h3>
             </div>
             
-            <p className="text-[10px] text-zinc-600 font-semibold leading-relaxed">
-              Submit a quick post-session check-in to complete your review.
+            <p className="text-[10px] text-zinc-650 font-semibold leading-relaxed">
+              Submit a quick post-session preparation review. This is not a medical assessment.
             </p>
-
+ 
             <div className="space-y-4 pt-2">
               {/* workload slider */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-bold">
-                  <span className="text-zinc-350">workload status</span>
+                  <span className="text-zinc-500">Freshness Index</span>
                   <span className="text-zinc-950">{workload}/10</span>
                 </div>
                 <input 
@@ -283,16 +297,16 @@ export default function PostSessionReviewPage() {
                   onChange={(e) => setWorkload(parseInt(e.target.value))}
                   className="w-full accent-blue-500 bg-zinc-100 rounded-lg h-2 border border-zinc-300 appearance-none cursor-pointer"
                 />
-                <div className="flex justify-between text-[8px] text-zinc-500">
-                  <span>Poor</span>
-                  <span>Restful</span>
+                <div className="flex justify-between text-[8px] text-zinc-550">
+                  <span>Fatigued</span>
+                  <span>Fully refreshed</span>
                 </div>
               </div>
-
+ 
               {/* Training Load Balance slider */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-bold">
-                  <span className="text-zinc-350">Training Load Balance</span>
+                  <span className="text-zinc-500">Perceived Exertion Balance</span>
                   <span className="text-zinc-950">{trainingloadBalanceScale}/10</span>
                 </div>
                 <input 
@@ -301,16 +315,16 @@ export default function PostSessionReviewPage() {
                   onChange={(e) => setTrainingloadBalanceScale(parseInt(e.target.value))}
                   className="w-full accent-amber-500 bg-zinc-100 rounded-lg h-2 border border-zinc-300 appearance-none cursor-pointer"
                 />
-                <div className="flex justify-between text-[8px] text-zinc-500">
-                  <span>Optimal</span>
-                  <span>Imbalanced</span>
+                <div className="flex justify-between text-[8px] text-zinc-550">
+                  <span>Aligned</span>
+                  <span>Review trend</span>
                 </div>
               </div>
-
+ 
               {/* load balance slider */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-bold">
-                  <span className="text-zinc-350">Session Readiness</span>
+                  <span className="text-zinc-500">Session preparation indicator</span>
                   <span className="text-zinc-950">{loadBalance}/10</span>
                 </div>
                 <input 
@@ -319,16 +333,16 @@ export default function PostSessionReviewPage() {
                   onChange={(e) => setloadBalance(parseInt(e.target.value))}
                   className="w-full accent-red-500 bg-zinc-100 rounded-lg h-2 border border-zinc-300 appearance-none cursor-pointer"
                 />
-                <div className="flex justify-between text-[8px] text-zinc-500">
-                  <span>Standard</span>
-                  <span>High Readiness</span>
+                <div className="flex justify-between text-[8px] text-zinc-550">
+                  <span>Baseline</span>
+                  <span>Fully prepared</span>
                 </div>
               </div>
-
+ 
               {/* availability slider */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-bold">
-                  <span className="text-zinc-350">availability status</span>
+                  <span className="text-zinc-500">Tension monitoring review</span>
                   <span className="text-zinc-950">{availability}/10</span>
                 </div>
                 <input 
@@ -337,9 +351,9 @@ export default function PostSessionReviewPage() {
                   onChange={(e) => setAvailability(parseInt(e.target.value))}
                   className="w-full accent-purple-500 bg-zinc-100 rounded-lg h-2 border border-zinc-300 appearance-none cursor-pointer"
                 />
-                <div className="flex justify-between text-[8px] text-zinc-500">
-                  <span>Calm</span>
-                  <span>High Tension</span>
+                <div className="flex justify-between text-[8px] text-zinc-550">
+                  <span>Comfortable</span>
+                  <span>Monitoring requested</span>
                 </div>
               </div>
             </div>

@@ -8,10 +8,8 @@ import {
   Target, 
   TrendingUp, 
   Zap, 
-  Award, 
   Activity,
   Compass,
-  CheckCircle,
   Plus
 } from 'lucide-react';
 import { 
@@ -24,49 +22,82 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
+import { DEMO_ATHLETE_ID, getActiveSessionForAthlete, getTargetForAthlete, getTargetProgress, mockGoals, PlannedSessionConfig } from '@/data';
 
 export default function GoalsPage() {
+  const [activeConfig, setActiveConfig] = React.useState<PlannedSessionConfig | null>(null);
+  const [lastSession, setLastSession] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    try {
+      setActiveConfig(getActiveSessionForAthlete(DEMO_ATHLETE_ID));
+      const last = localStorage.getItem('ssp-last-session');
+      setLastSession(last ? JSON.parse(last) : null);
+    } catch {
+      setActiveConfig(null);
+      setLastSession(null);
+    }
+  }, []);
+
+  const isAssigned = !!(activeConfig && activeConfig.selectedPlayerIds?.includes(DEMO_ATHLETE_ID));
+  const activeTarget = getTargetForAthlete(isAssigned ? activeConfig : null, DEMO_ATHLETE_ID);
+  const currentDistance = Number(lastSession?.distanceMeters || 0);
+  const currentSprints = Number(lastSession?.sprints || 0);
+  const currentWorkload = Number(lastSession?.strain || 0);
 
   // Dynamic Goal data
   const goalsData = [
     {
+      id: 'distance',
+      label: 'Session Distance',
+      current: currentDistance,
+      target: activeTarget.distanceMeters,
+      unit: 'm',
+      pct: getTargetProgress(currentDistance, activeTarget.distanceMeters),
+      color: '#10b981',
+      icon: Compass
+    },
+    {
       id: 'sprints',
-      label: 'Sprint Targets',
-      current: 12,
-      target: 15,
-      unit: 'sprints',
-      pct: 80,
+      label: 'Sprint Efforts',
+      current: currentSprints,
+      target: activeTarget.sprintCount,
+      unit: 'above threshold',
+      pct: getTargetProgress(currentSprints, activeTarget.sprintCount),
       color: '#f59e0b', // Amber
       icon: Zap
     },
     {
       id: 'loads',
-      label: 'Total Session Loads',
-      current: 412,
-      target: 500,
-      unit: 'ARB strain',
-      pct: 82,
+      label: 'Workload Target',
+      current: currentWorkload,
+      target: activeTarget.workloadIndex,
+      unit: 'index',
+      pct: getTargetProgress(currentWorkload, activeTarget.workloadIndex),
       color: '#155EEF', // Performance Blue
       icon: Activity
     },
-    {
-      id: 'distance',
-      label: 'High-Intensity Dist.',
-      current: 2.8,
-      target: 4.0,
-      unit: 'km in zone 3+',
-      pct: 70,
-      color: '#10b981', // Emerald
-      icon: Compass
-    }
+    ...mockGoals
+      .filter((goal) => goal.assignedTo === DEMO_ATHLETE_ID)
+      .slice(0, 1)
+      .map((goal) => ({
+        id: goal.id,
+        label: goal.title,
+        current: goal.currentValue,
+        target: goal.targetValue,
+        unit: goal.unit,
+        pct: getTargetProgress(goal.currentValue, goal.targetValue),
+        color: '#64748b',
+        icon: Target,
+      }))
   ];
 
   // Recharts week over week bar chart comparison
   const weeklyTrends = [
-    { week: 'W1', sprints: 8, targetSprints: 15, loads: 320, targetLoads: 500, distance: 2.1, targetDist: 4.0 },
-    { week: 'W2', sprints: 11, targetSprints: 15, loads: 410, targetLoads: 500, distance: 2.9, targetDist: 4.0 },
-    { week: 'W3', sprints: 14, targetSprints: 15, loads: 480, targetLoads: 500, distance: 3.5, targetDist: 4.0 },
-    { week: 'W4', sprints: 12, targetSprints: 15, loads: 412, targetLoads: 500, distance: 2.8, targetDist: 4.0 }
+    { week: 'W1', sprints: 8, targetSprints: activeTarget.sprintCount, loads: 62, targetLoads: activeTarget.workloadIndex, distance: 5100, targetDist: activeTarget.distanceMeters },
+    { week: 'W2', sprints: 11, targetSprints: activeTarget.sprintCount, loads: 70, targetLoads: activeTarget.workloadIndex, distance: 5800, targetDist: activeTarget.distanceMeters },
+    { week: 'W3', sprints: 14, targetSprints: activeTarget.sprintCount, loads: 78, targetLoads: activeTarget.workloadIndex, distance: 6400, targetDist: activeTarget.distanceMeters },
+    { week: 'W4', sprints: 12, targetSprints: activeTarget.sprintCount, loads: 74, targetLoads: activeTarget.workloadIndex, distance: 6200, targetDist: activeTarget.distanceMeters }
   ];
 
   return (
@@ -83,7 +114,7 @@ export default function GoalsPage() {
           </div>
           <h1 className="text-3xl font-black tracking-tight text-zinc-950 mt-1">Milestones & Targets</h1>
           <p className="text-xs lg:text-sm text-zinc-600 font-medium">
-            Track and configure sessional goals. Monitor progress rings and week-over-week performance thresholds.
+            Track coach-set session targets and personal progress indicators.
           </p>
         </div>
 
@@ -172,7 +203,7 @@ export default function GoalsPage() {
                   {goal.current} <span className="text-zinc-500 font-normal text-xs">/ {goal.target} {goal.unit}</span>
                 </p>
                 <p className="text-[8px] font-bold text-zinc-500 mt-0.5">
-                  WEEKLY TARGET BENCHMARK
+                  ACTIVE TARGET
                 </p>
               </div>
             </div>
@@ -219,9 +250,9 @@ export default function GoalsPage() {
                     return (
                       <div className="bg-zinc-100 border border-zinc-200 p-3 rounded-xl shadow-2xl text-[10px] space-y-1.5">
                         <p className="font-extrabold text-zinc-950">WEEK {data.week}</p>
-                        <p className="text-amber-400">SPRINTS: {data.sprints} / {data.targetSprints} reps</p>
-                        <p className="text-brand-blue">LOAD STRAIN: {data.loads} / {data.targetLoads} ARB</p>
-                        <p className="text-emerald-400">DIST. IN ZONE: {data.distance} / {data.targetDist} km</p>
+                        <p className="text-amber-400">SPRINT EFFORTS: {data.sprints} / {data.targetSprints}</p>
+                        <p className="text-brand-blue">WORKLOAD: {data.loads} / {data.targetLoads}</p>
+                        <p className="text-emerald-400">DISTANCE: {data.distance} / {data.targetDist} m</p>
                       </div>
                     );
                   }
@@ -234,7 +265,7 @@ export default function GoalsPage() {
                 align="center"
                 iconType="circle"
               />
-              <Bar dataKey="loads" fill="#155EEF" name="Logged Load Strain" radius={[4, 4, 0, 0]} maxBarSize={30} />
+              <Bar dataKey="loads" fill="#155EEF" name="Logged Workload" radius={[4, 4, 0, 0]} maxBarSize={30} />
               <Bar dataKey="targetLoads" fill="#27272a" stroke="#155EEF" strokeWidth={1} name="Load Targets" radius={[4, 4, 0, 0]} maxBarSize={30} />
               </BarChart>
             </ResponsiveContainer>

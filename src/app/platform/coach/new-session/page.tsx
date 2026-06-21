@@ -3,17 +3,26 @@
 import * as React from 'react';
 import * as Icons from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { mockPlayers } from '@/data';
+import { defaultSessionTarget, mockPlayers, normalizeSessionConfig, upsertActiveSession } from '@/data';
 
-type SessionType = 'training' | 'Speed' | 'Conditioning' | 'Recovery';
+type SessionType = 'training' | 'match';
 
 export default function CreateTrainingSessionPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = React.useState<number>(1);
 
   // Step 1 State: Details
-  const [title, setTitle] = React.useState<string>('training High-Press Transition');
+  const [title, setTitle] = React.useState<string>('Training High-Press Transition');
   const [description, setDescription] = React.useState<string>('Focusing on explosive counter-pressing and 3-second recovery runs in the final third.');
+  const [coachNotes, setCoachNotes] = React.useState<string>('');
+  const [distanceClassification, setDistanceClassification] = React.useState<string>('Standard Distance (5000m - 7500m)');
+  const [sessionDate, setSessionDate] = React.useState<string>('2026-05-27');
+  const [plannedStartTime, setPlannedStartTime] = React.useState<string>('15:30');
+  const [plannedEndTime, setPlannedEndTime] = React.useState<string>('16:45');
+  const [sessionCategory, setSessionCategory] = React.useState<string>('Attacking transition');
+  const [sport, setSport] = React.useState<string>('Football');
+  const [ageGroup, setAgeGroup] = React.useState<string>('U18');
+  const [level, setLevel] = React.useState<string>('Academy');
   const [duration, setDuration] = React.useState<number>(75);
   const [intensity, setIntensity] = React.useState<number>(80);
   const [sessionType, setSessionType] = React.useState<SessionType>('training');
@@ -28,6 +37,8 @@ export default function CreateTrainingSessionPage() {
   const [targetDistance, setTargetDistance] = React.useState<number>(6500);
   const [targetSprints, setTargetSprints] = React.useState<number>(12);
   const [maxSpeedLimit, setMaxSpeedLimit] = React.useState<number>(8.5);
+  const [targetWorkload, setTargetWorkload] = React.useState<number>(80);
+  const [customOverrides, setCustomOverrides] = React.useState<Record<string, any>>({});
 
   // Step 4 State: Loading trigger
   const [isActivating, setIsActivating] = React.useState<boolean>(false);
@@ -55,6 +66,37 @@ export default function CreateTrainingSessionPage() {
     }
   };
 
+  const toggleOverride = (playerId: string) => {
+    setCustomOverrides((prev) => {
+      if (prev[playerId]) {
+        const next = { ...prev };
+        delete next[playerId];
+        return next;
+      } else {
+        return {
+          ...prev,
+          [playerId]: {
+            distanceMeters: targetDistance,
+            sprintCount: targetSprints,
+            maxSpeedMps: maxSpeedLimit,
+            workloadIndex: targetWorkload,
+            durationMinutes: duration,
+          },
+        };
+      }
+    });
+  };
+
+  const updateOverrideField = (playerId: string, field: string, value: number) => {
+    setCustomOverrides((prev) => ({
+      ...prev,
+      [playerId]: {
+        ...prev[playerId],
+        [field]: value,
+      },
+    }));
+  };
+
   const handleNext = () => {
     if (currentStep < 4) setCurrentStep((prev) => prev + 1);
   };
@@ -68,25 +110,55 @@ export default function CreateTrainingSessionPage() {
     
     // Store in localStorage to pass state to the live session
     if (typeof window !== 'undefined') {
-      const activeSessionData = {
+      const squadTargets = {
+        ...defaultSessionTarget,
+        distanceMeters: targetDistance,
+        sprintCount: targetSprints,
+        maxSpeedMps: maxSpeedLimit,
+        workloadIndex: targetWorkload,
+        durationMinutes: duration,
+      };
+      const createdAt = new Date().toISOString();
+      const activeSessionData = normalizeSessionConfig({
+        id: `sess-${Date.now()}`,
         title,
         description,
         duration,
+        plannedDurationMinutes: duration,
         intensity,
         sessionType,
+        sessionCategory,
+        sessionDate,
+        plannedStartTime,
+        plannedEndTime,
+        sport,
+        ageGroup,
+        level,
         selectedPlayerIds: selectedPlayers,
-        targetDistance,
-        targetSprints,
-        maxSpeedLimit,
+        squadTarget: squadTargets,
+        squadTargets,
+        individualTargets: customOverrides,
+        objectives: description,
+        sessionObjectives: description,
+        coachNotes: coachNotes,
         isActive: true,
-        startTime: new Date().toISOString(),
-      };
-      localStorage.setItem('active_session_config', JSON.stringify(activeSessionData));
+        startTime: createdAt,
+        distanceClassification,
+        createdAt,
+        status: 'active',
+      });
+      
+      upsertActiveSession(activeSessionData);
     }
 
     setTimeout(() => {
       setIsActivating(false);
       router.push('/platform/coach/live-session');
+      window.setTimeout(() => {
+        if (window.location.pathname !== '/platform/coach/live-session') {
+          window.location.assign('/platform/coach/live-session');
+        }
+      }, 250);
     }, 1500);
   };
 
@@ -184,7 +256,7 @@ export default function CreateTrainingSessionPage() {
         {currentStep === 1 && (
           <div className="space-y-6 animate-in fade-in duration-300">
             <div className="border-b border-zinc-200 dark:border-zinc-800 pb-3">
-              <h3 className="text-lg font-black text-zinc-900 dark:text-white">Step 1: Session Details</h3>
+              <h3 className="text-lg font-black text-zinc-900 dark:text-white">Step 1: {sessionType === 'training' ? 'Training' : 'Match'} Session Details</h3>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">Classify session category and define general duration goals.</p>
             </div>
 
@@ -202,13 +274,54 @@ export default function CreateTrainingSessionPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-zinc-650 dark:text-zinc-450">training Purpose</label>
+                  <label className="text-xs font-bold text-zinc-650 dark:text-zinc-450">Session Objectives</label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={4}
                     className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-brand-blue font-semibold resize-none"
-                    placeholder="Describe training details..."
+                    placeholder="Describe session details..."
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-zinc-650 dark:text-zinc-450">Session Date</label>
+                    <input
+                      type="date"
+                      value={sessionDate}
+                      onChange={(e) => setSessionDate(e.target.value)}
+                      className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-900 dark:text-white focus:outline-none focus:border-brand-blue font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-zinc-650 dark:text-zinc-450">Planned Start</label>
+                    <input
+                      type="time"
+                      value={plannedStartTime}
+                      onChange={(e) => setPlannedStartTime(e.target.value)}
+                      className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-900 dark:text-white focus:outline-none focus:border-brand-blue font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-zinc-650 dark:text-zinc-450">Planned End</label>
+                    <input
+                      type="time"
+                      value={plannedEndTime}
+                      onChange={(e) => setPlannedEndTime(e.target.value)}
+                      className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-900 dark:text-white focus:outline-none focus:border-brand-blue font-bold"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-zinc-650 dark:text-zinc-450">Coach Notes</label>
+                  <textarea
+                    value={coachNotes}
+                    onChange={(e) => setCoachNotes(e.target.value)}
+                    rows={3}
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-brand-blue font-semibold resize-none"
+                    placeholder="Add notes for review..."
                   />
                 </div>
               </div>
@@ -217,7 +330,7 @@ export default function CreateTrainingSessionPage() {
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-zinc-650 dark:text-zinc-450 block">Session Classification</label>
                   <div className="grid grid-cols-2 gap-2">
-                    {(['training', 'Speed', 'Conditioning', 'Recovery'] as const).map((type) => (
+                    {(['training', 'match'] as const).map((type) => (
                       <button
                         key={type}
                         type="button"
@@ -228,10 +341,62 @@ export default function CreateTrainingSessionPage() {
                             : 'bg-zinc-200 text-zinc-700 border-zinc-300 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800 hover:border-zinc-400'
                         }`}
                       >
-                        {type}
+                        {type === 'training' ? 'Training' : 'Match'}
                       </button>
                     ))}
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-zinc-650 dark:text-zinc-450 block">Session Category</label>
+                    <input
+                      type="text"
+                      value={sessionCategory}
+                      onChange={(e) => setSessionCategory(e.target.value)}
+                      className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-brand-blue"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-zinc-650 dark:text-zinc-450 block">Sport</label>
+                    <input
+                      type="text"
+                      value={sport}
+                      onChange={(e) => setSport(e.target.value)}
+                      className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-brand-blue"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-zinc-650 dark:text-zinc-450 block">Age Group</label>
+                    <input
+                      type="text"
+                      value={ageGroup}
+                      onChange={(e) => setAgeGroup(e.target.value)}
+                      className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-brand-blue"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-zinc-650 dark:text-zinc-450 block">Level</label>
+                    <input
+                      type="text"
+                      value={level}
+                      onChange={(e) => setLevel(e.target.value)}
+                      className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-brand-blue"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-zinc-650 dark:text-zinc-450 block">Distance Classification</label>
+                  <select
+                    value={distanceClassification}
+                    onChange={(e) => setDistanceClassification(e.target.value)}
+                    className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-xs font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-brand-blue cursor-pointer"
+                  >
+                    <option value="Low Volume (<5000m)">Low Volume (&lt;5000m)</option>
+                    <option value="Standard Distance (5000m - 7500m)">Standard Distance (5000m - 7500m)</option>
+                    <option value="High Volume (>7500m)">High Volume (&gt;7500m)</option>
+                  </select>
                 </div>
 
                 <div className="space-y-2.5">
@@ -360,7 +525,7 @@ export default function CreateTrainingSessionPage() {
               <p className="text-xs text-zinc-500 dark:text-zinc-400">Establish session performance targets. These represent target indicators for the drills.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               {/* Constraint 1: Distance Target */}
               <div className="bg-zinc-100 dark:bg-zinc-950 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-850 flex flex-col justify-between space-y-4">
                 <div className="flex items-center space-x-2 border-b border-zinc-200 dark:border-zinc-900 pb-2">
@@ -388,15 +553,15 @@ export default function CreateTrainingSessionPage() {
                 </div>
               </div>
 
-              {/* Constraint 2: Sprint Count Target */}
+              {/* Constraint 2: Sprint Efforts */}
               <div className="bg-zinc-100 dark:bg-zinc-950 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-850 flex flex-col justify-between space-y-4">
                 <div className="flex items-center space-x-2 border-b border-zinc-200 dark:border-zinc-900 pb-2">
                   <Icons.Flame className="h-5 w-5 text-brand-blue" />
-                  <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Sprint Count</h4>
+                  <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Sprint Efforts</h4>
                 </div>
                 <div className="text-center py-4">
                   <span className="text-3xl font-black text-zinc-900 dark:text-white">{targetSprints}</span>
-                  <span className="text-xs text-zinc-500 dark:text-zinc-450 block mt-1 font-bold">Sprints</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-450 block mt-1 font-bold">Above threshold</span>
                 </div>
                 <div className="space-y-2">
                   <input
@@ -410,20 +575,20 @@ export default function CreateTrainingSessionPage() {
                   />
                   <div className="flex justify-between text-[9px] text-zinc-500">
                     <span>2</span>
-                    <span>30 sprints</span>
+                    <span>30 efforts</span>
                   </div>
                 </div>
               </div>
 
-              {/* Constraint 3: Max Speed Limits */}
+              {/* Constraint 3: Max Velocity Target */}
               <div className="bg-zinc-100 dark:bg-zinc-950 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-850 flex flex-col justify-between space-y-4">
                 <div className="flex items-center space-x-2 border-b border-zinc-200 dark:border-zinc-900 pb-2">
                   <Icons.Gauge className="h-5 w-5 text-brand-blue" />
-                  <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Speed Limit Warning</h4>
+                  <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Max Velocity Target</h4>
                 </div>
                 <div className="text-center py-4">
                   <span className="text-3xl font-black text-zinc-900 dark:text-white">{maxSpeedLimit}</span>
-                  <span className="text-xs text-zinc-500 dark:text-zinc-450 block mt-1 font-bold">M/S Warning Limit</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-450 block mt-1 font-bold">m/s target</span>
                 </div>
                 <div className="space-y-2">
                   <input
@@ -440,6 +605,153 @@ export default function CreateTrainingSessionPage() {
                     <span>10.0 m/s</span>
                   </div>
                 </div>
+              </div>
+
+              {/* Constraint 4: Workload Target */}
+              <div className="bg-zinc-100 dark:bg-zinc-950 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-850 flex flex-col justify-between space-y-4">
+                <div className="flex items-center space-x-2 border-b border-zinc-200 dark:border-zinc-900 pb-2">
+                  <Icons.Activity className="h-5 w-5 text-brand-blue" />
+                  <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Workload Target</h4>
+                </div>
+                <div className="text-center py-4">
+                  <span className="text-3xl font-black text-zinc-900 dark:text-white">{targetWorkload}</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-450 block mt-1 font-bold">Index</span>
+                </div>
+                <div className="space-y-2">
+                  <input
+                    type="range"
+                    min="20"
+                    max="100"
+                    step="5"
+                    value={targetWorkload}
+                    onChange={(e) => setTargetWorkload(Number(e.target.value))}
+                    className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-brand-blue"
+                  />
+                  <div className="flex justify-between text-[9px] text-zinc-500">
+                    <span>20</span>
+                    <span>100</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Individual Targets Customization Area */}
+            <div className="bg-zinc-100 dark:bg-zinc-950 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-850 space-y-4">
+              <div className="border-b border-zinc-200 dark:border-zinc-900 pb-2">
+                <h4 className="text-xs font-black text-zinc-800 dark:text-zinc-200">Individual Target Overrides</h4>
+                <p className="text-[10px] text-zinc-500 mt-0.5">Customize individual performance targets for selected players in this session.</p>
+              </div>
+
+              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
+                {mockPlayers
+                  .filter((p) => selectedPlayers.includes(p.id))
+                  .map((player) => {
+                    const isCustom = !!customOverrides[player.id];
+                    const playerOverride = customOverrides[player.id];
+                    return (
+                      <div key={player.id} className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="flex items-center space-x-2">
+                            <div className="h-6 w-6 rounded-full bg-brand-blue/15 text-brand-blue flex items-center justify-center font-bold text-[10px]">
+                              {player.squadNumber}
+                            </div>
+                            <span className="text-xs font-extrabold text-zinc-900 dark:text-zinc-250">{player.name}</span>
+                            <span className="text-[9px] font-bold text-zinc-500">{player.position}</span>
+                          </div>
+                          
+                          <button
+                            type="button"
+                            onClick={() => toggleOverride(player.id)}
+                            className={`px-3 py-1.5 rounded-lg text-[9px] font-black cursor-pointer border transition-all ${
+                              isCustom
+                                ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                : 'bg-zinc-100 text-zinc-650 border-zinc-300 hover:bg-zinc-250 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700'
+                            }`}
+                          >
+                            {isCustom ? 'Reset to Squad Target' : 'Customize Target'}
+                          </button>
+                        </div>
+
+                        {isCustom && playerOverride && (
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-250 dark:border-zinc-850">
+                            {/* Distance */}
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between text-[9px] font-extrabold text-zinc-500">
+                                <span>Distance</span>
+                                <span className="text-brand-blue">{playerOverride.distanceMeters}m</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="2000"
+                                max="12000"
+                                step="250"
+                                value={playerOverride.distanceMeters}
+                                onChange={(e) => updateOverrideField(player.id, 'distanceMeters', Number(e.target.value))}
+                                className="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-brand-blue"
+                              />
+                            </div>
+
+                            {/* Sprints */}
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between text-[9px] font-extrabold text-zinc-500">
+                                <span>Sprint Efforts</span>
+                                <span className="text-brand-blue">{playerOverride.sprintCount}</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0"
+                                max="30"
+                                step="1"
+                                value={playerOverride.sprintCount}
+                                onChange={(e) => updateOverrideField(player.id, 'sprintCount', Number(e.target.value))}
+                                className="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-brand-blue"
+                              />
+                            </div>
+
+                            {/* Max Speed */}
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between text-[9px] font-extrabold text-zinc-500">
+                                <span>Max Speed</span>
+                                <span className="text-brand-blue">{playerOverride.maxSpeedMps} m/s</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="5.0"
+                                max="10.0"
+                                step="0.1"
+                                value={playerOverride.maxSpeedMps}
+                                onChange={(e) => updateOverrideField(player.id, 'maxSpeedMps', Number(e.target.value))}
+                                className="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-brand-blue"
+                              />
+                            </div>
+
+                            {/* Workload */}
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between text-[9px] font-extrabold text-zinc-500">
+                                <span>Workload Index</span>
+                                <span className="text-brand-blue">{playerOverride.workloadIndex}</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="20"
+                                max="100"
+                                step="5"
+                                value={playerOverride.workloadIndex}
+                                onChange={(e) => updateOverrideField(player.id, 'workloadIndex', Number(e.target.value))}
+                                className="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded appearance-none cursor-pointer accent-brand-blue"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {!isCustom && (
+                          <p className="text-[9px] text-zinc-500 italic pl-8">
+                            Using Squad defaults: {targetDistance}m • {targetSprints} efforts • {maxSpeedLimit} m/s • Workload {targetWorkload}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           </div>
@@ -463,6 +775,9 @@ export default function CreateTrainingSessionPage() {
                     <span className="text-[10px] font-bold text-zinc-500">Duration: {duration} mins</span>
                   </div>
                   <h4 className="text-lg font-black text-zinc-900 dark:text-white">{title}</h4>
+                  <p className="text-[10px] text-zinc-500 font-bold">
+                    {sessionDate} | {plannedStartTime} - {plannedEndTime} | {sport} / {ageGroup} / {level}
+                  </p>
                   <p className="text-xs text-zinc-650 dark:text-zinc-400 leading-relaxed font-semibold">{description}</p>
                 </div>
 
@@ -498,7 +813,12 @@ export default function CreateTrainingSessionPage() {
                       .filter((p) => selectedPlayers.includes(p.id))
                       .map((player) => (
                         <div key={player.id} className="flex justify-between items-center bg-white dark:bg-zinc-900/50 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-850/40">
-                          <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{player.name}</span>
+                          <div className="flex items-center space-x-1.5">
+                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{player.name}</span>
+                            {customOverrides[player.id] && (
+                              <span className="text-[8px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1 rounded font-black">Customized</span>
+                            )}
+                          </div>
                           <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-bold">{player.position}</span>
                         </div>
                       ))}

@@ -86,13 +86,13 @@ export default function SettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         
         {/* Navigation Sidebar */}
-        <div className="bg-zinc-50 border border-zinc-300 p-4 rounded-2xl shadow-xl space-y-1.5 h-fit">
+        <div className="bg-zinc-50 border border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 p-4 rounded-2xl shadow-xl space-y-1.5 h-fit">
           <button
             onClick={() => setActiveTab('thresholds')}
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
               activeTab === 'thresholds'
                 ? 'bg-brand-blue text-white'
-                : 'text-zinc-600 hover:text-zinc-800 hover:bg-zinc-800/40'
+                : 'text-zinc-650 hover:text-zinc-900 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-800/40'
             }`}
           >
             <Icons.Sliders className="h-4 w-4 shrink-0" />
@@ -104,7 +104,7 @@ export default function SettingsPage() {
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
               activeTab === 'hardware'
                 ? 'bg-brand-blue text-white'
-                : 'text-zinc-600 hover:text-zinc-800 hover:bg-zinc-800/40'
+                : 'text-zinc-650 hover:text-zinc-900 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-800/40'
             }`}
           >
             <Icons.Cpu className="h-4 w-4 shrink-0" />
@@ -116,7 +116,7 @@ export default function SettingsPage() {
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
               activeTab === 'compliance'
                 ? 'bg-brand-blue text-white'
-                : 'text-zinc-600 hover:text-zinc-800 hover:bg-zinc-800/40'
+                : 'text-zinc-650 hover:text-zinc-900 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-800/40'
             }`}
           >
             <Icons.Lock className="h-4 w-4 shrink-0" />
@@ -132,7 +132,9 @@ export default function SettingsPage() {
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="border-b border-zinc-200 pb-3">
                 <h3 className="text-base font-black text-zinc-950">Workload Alarm Thresholds</h3>
-                <p className="text-xs text-zinc-600 mt-0.5">Control filters that trigger elevated ACWR alerts on the main dashboard.</p>
+                <p className="text-xs text-zinc-650 mt-0.5">
+                  Control filters that trigger elevated ACWR alerts on the main dashboard. All thresholds represent demo-configured parameters for coaching review purposes, not universal risk or clinical diagnosis limits.
+                </p>
               </div>
 
               <div className="space-y-5">
@@ -215,21 +217,23 @@ export default function SettingsPage() {
 
               <div className="space-y-4">
                 {/* 1. Tracking mode selector */}
-                <div className="bg-zinc-100 p-5 rounded-2xl border border-zinc-300 flex items-center justify-between">
+                <div className="bg-zinc-100 dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-300 dark:border-zinc-800 flex items-center justify-between">
                   <div>
-                    <h4 className="text-xs font-black text-zinc-950">Tracking Accuracy</h4>
+                    <h4 className="text-xs font-black text-zinc-950 dark:text-zinc-200">Tracking Accuracy</h4>
                     <p className="text-[9px] text-zinc-500 mt-1">
                       Enhanced mode increases tracking detail but halves battery lifespan.
                     </p>
                   </div>
-                  <div className="flex bg-zinc-50 p-1 rounded-xl border border-zinc-200">
+                  <div className="flex bg-zinc-50 dark:bg-zinc-950 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800">
                     {['Standard', 'Enhanced'].map((rate) => (
                       <button
                         key={rate}
                         type="button"
                         onClick={() => setTrackingMode(rate as 'Standard' | 'Enhanced')}
                         className={`px-4 py-2 text-[10px] font-extrabold rounded-lg transition-all cursor-pointer ${
-                          trackingMode === rate ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-700'
+                          trackingMode === rate 
+                            ? 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow' 
+                            : 'text-zinc-650 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'
                         }`}
                       >
                         {rate}
@@ -303,7 +307,7 @@ export default function SettingsPage() {
                   <select
                     value={retentionPeriod}
                     onChange={(e) => setRetentionPeriod(e.target.value)}
-                    className="bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-blue font-extrabold cursor-pointer"
+                    className="bg-zinc-550 border border-zinc-200 dark:border-zinc-850 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-blue font-extrabold cursor-pointer"
                   >
                     <option value="90">90 Days Cycle</option>
                     <option value="180">180 Days Cycle</option>

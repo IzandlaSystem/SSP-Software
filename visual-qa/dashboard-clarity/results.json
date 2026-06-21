@@ -1,0 +1,19 @@
+{
+  "checks": {
+    "pass": true,
+    "missing": [],
+    "banned": []
+  },
+  "shots": [
+    "visual-qa/dashboard-clarity/01-control-bar.png",
+    "visual-qa/dashboard-clarity/02-selected-focus-summary.png",
+    "visual-qa/dashboard-clarity/03-squad-system-status.png",
+    "visual-qa/dashboard-clarity/04-target-achievement-graph.png",
+    "visual-qa/dashboard-clarity/05-actual-vs-target-graph.png",
+    "visual-qa/dashboard-clarity/06-high-speed-efforts-graph.png",
+    "visual-qa/dashboard-clarity/07-workload-vs-planned-load-graph.png",
+    "visual-qa/dashboard-clarity/08-training-exposure-vs-match-demand-graph.png",
+    "visual-qa/dashboard-clarity/09-selected-player-state.png",
+    "visual-qa/dashboard-clarity/10-all-players-state.png"
+  ]
+}

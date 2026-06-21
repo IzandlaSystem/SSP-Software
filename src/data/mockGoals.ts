@@ -63,7 +63,7 @@ export const mockGoals: Goal[] = [
   {
     id: 'g-205',
     title: 'Workload Balance',
-    description: 'Manage workload strain quotient under 80 to prevent excessive single-week loading spikes.',
+    description: 'Keep workload index visible for coach review when single-week loading changes quickly.',
     targetValue: 80,
     currentValue: 95,
     unit: 'index',

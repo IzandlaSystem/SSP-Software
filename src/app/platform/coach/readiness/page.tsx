@@ -62,24 +62,26 @@ export default function AvailabilityPage() {
             <span>session preparation Matrix</span>
           </div>
           <h1 className="text-3xl font-black tracking-tight text-zinc-950">
-            Availability & Session Readiness
+            Availability & Session preparation
           </h1>
           <p className="text-sm text-zinc-600 mt-1">
-            Evaluate roster self-reported session preparation indicators. Identify strain anomalies before scheduling high-velocity conditioning.
+            Evaluate roster self-reported session preparation indicators. Review workload trend deviations before scheduling speed running training.
           </p>
         </div>
       </div>
 
       {/* Filter toolbar */}
-      <div className="bg-zinc-50 border border-zinc-300 p-4 rounded-2xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-zinc-50 border border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 p-4 rounded-2xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
         
-        <div className="flex bg-zinc-100 p-1 rounded-xl border border-zinc-200 w-full sm:w-auto">
+        <div className="flex bg-zinc-100 dark:bg-zinc-950 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800 w-full sm:w-auto">
           {(['All', 'Optimal', 'Adaptive', 'Restricted'] as const).map((filter) => (
             <button
               key={filter}
               onClick={() => setSelectedFilter(filter)}
               className={`flex-1 sm:flex-initial px-5 py-2.5 text-xs font-extrabold rounded-lg transition-all cursor-pointer ${
-                selectedFilter === filter ? 'bg-zinc-800 text-white' : 'text-zinc-600 hover:text-zinc-800'
+                selectedFilter === filter 
+                  ? 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow' 
+                  : 'text-zinc-650 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'
               }`}
             >
               {filter === 'All' ? 'All Athletes' : filter}
@@ -88,27 +90,27 @@ export default function AvailabilityPage() {
         </div>
 
         {/* Legend bar */}
-        <div className="flex items-center gap-3 bg-zinc-100 px-4 py-2 rounded-xl border border-zinc-300 self-start sm:self-center">
-          <span className="text-[9px] font-bold text-zinc-500 mr-2">Heat levels:</span>
+        <div className="flex items-center gap-3 bg-zinc-100 dark:bg-zinc-955 px-4 py-2 rounded-xl border border-zinc-300 dark:border-zinc-800 self-start sm:self-center">
+          <span className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 mr-2">Heat levels:</span>
           <div className="flex gap-4 text-[10px] font-bold">
             <span className="flex items-center space-x-1.5 text-emerald-400"><span className="h-2.5 w-2.5 rounded bg-emerald-500/20 border border-emerald-500/35" /> <span>Optimal (&ge;80)</span></span>
-            <span className="flex items-center space-x-1.5 text-amber-400"><span className="h-2.5 w-2.5 rounded bg-amber-500/20 border border-amber-500/35" /> <span>Caution (50-79)</span></span>
-            <span className="flex items-center space-x-1.5 text-brand-cyan"><span className="h-2.5 w-2.5 rounded bg-brand-blue/20 border border-brand-blue/35" /> <span>Warning (&lt;50)</span></span>
+            <span className="flex items-center space-x-1.5 text-amber-500"><span className="h-2.5 w-2.5 rounded bg-amber-500/20 border border-amber-500/35" /> <span>Monitor Trend (50-79)</span></span>
+            <span className="flex items-center space-x-1.5 text-rose-500"><span className="h-2.5 w-2.5 rounded bg-rose-500/20 border border-rose-500/35" /> <span>Load Flag Review (&lt;50)</span></span>
           </div>
         </div>
       </div>
-
+ 
       {/* Main Heatmap Grid table */}
-      <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 shadow-xl">
-        <div className="border-b border-zinc-200 pb-3 mb-5 flex items-center justify-between">
-          <h3 className="font-extrabold text-base text-zinc-800">
-            Roster Availability & Readiness Heat-Grid
+      <div className="bg-zinc-50 border border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900 rounded-2xl p-6 shadow-xl">
+        <div className="border-b border-zinc-200 dark:border-zinc-800 pb-3 mb-5 flex items-center justify-between">
+          <h3 className="font-extrabold text-base text-zinc-800 dark:text-zinc-200">
+            Roster Availability & Preparation Heat-Grid
           </h3>
           <span className="text-[10px] text-zinc-500 font-bold">
             Daily logs index
           </span>
         </div>
-
+ 
         {/* Heat Map Grid */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-zinc-600 border-collapse">
@@ -119,7 +121,7 @@ export default function AvailabilityPage() {
                 <th className="py-4 text-center">load balance</th>
                 <th className="py-4 text-center">availability status</th>
                 <th className="py-4 text-center">Energy Levels</th>
-                <th className="py-4 text-center pr-4">Coach Review Indicator</th>
+                <th className="py-4 text-center pr-4">Availability Monitor Indicator</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-850">
@@ -130,12 +132,12 @@ export default function AvailabilityPage() {
                 return (
                   <tr key={player.id} className="hover:bg-zinc-100/40 transition-colors">
                     {/* Athlete Info */}
-                    <td className="py-4 pl-4 font-black text-white flex items-center space-x-3">
+                    <td className="py-4 pl-4 font-black text-zinc-955 dark:text-white flex items-center space-x-3">
                       <div className="h-8 w-8 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center font-bold text-xs text-brand-blue">
                         {player.squadNumber}
                       </div>
                       <div>
-                        <h4 className="text-xs font-black text-zinc-950">{player.name}</h4>
+                        <h4 className="text-xs font-black text-zinc-950 dark:text-white">{player.name}</h4>
                         <span className="text-[9px] font-bold text-zinc-500 block">{player.position}</span>
                       </div>
                     </td>

@@ -75,8 +75,8 @@ export default function AthleteDetailPage({ params }: PageProps) {
   const [newNote, setNewNote] = React.useState<string>('');
   const [notesHistory, setNotesHistory] = React.useState<string[]>([
     'Demonstrated excellent explosive speed in training transition loops. Max speed achieved near peak limit.',
-    'Bilateral workload load is balanced. Optimal compliance with running sprint indices.',
-    'Caution: ACWR is creeping above chronic limits. Suggest training resting blocks for tomorrow\'s sessions.'
+    'Bilateral workload is monitored. Monitor compliance with sessional sprint targets.',
+    'Monitor trend: ACWR is creeping above baseline indicators. Suggest training load review for tomorrow\'s sessions. Not a medical assessment.'
   ]);
 
   // Handle adding notes
@@ -312,7 +312,7 @@ export default function AthleteDetailPage({ params }: PageProps) {
               </h3>
             </div>
             <span className="text-[10px] text-zinc-500 font-bold">
-              Acute:Chronic strain quotient
+              ACWR Review Indicator
             </span>
           </div>
 
@@ -347,14 +347,14 @@ export default function AthleteDetailPage({ params }: PageProps) {
                 />
                 <Legend wrapperStyle={{ fontSize: '10px', textTransform: 'none', fontFamily: 'Arial, Helvetica, sans-serif', paddingTop: '10px' }} />
                 
-                {/* Horizontal reference lines for warning bounds */}
-                <ReferenceLine y={1.3} label={{ value: 'CAUTION LIMIT (1.3)', fill: '#f59e0b', fontSize: 8, fontFamily: 'Arial, Helvetica, sans-serif', position: 'top' }} stroke="#f59e0b" strokeDasharray="3 3" />
-                <ReferenceLine y={0.8} label={{ value: 'LOW THRESHOLD (0.8)', fill: '#3b82f6', fontSize: 8, fontFamily: 'Arial, Helvetica, sans-serif', position: 'bottom' }} stroke="#3b82f6" strokeDasharray="3 3" />
+                {/* Horizontal reference lines for monitoring review prompts */}
+                <ReferenceLine y={1.3} label={{ value: 'MONITOR TREND FLAG (1.3)', fill: '#f59e0b', fontSize: 8, fontFamily: 'Arial, Helvetica, sans-serif', position: 'top' }} stroke="#f59e0b" strokeDasharray="3 3" />
+                <ReferenceLine y={0.8} label={{ value: 'BASELINE LIMIT (0.8)', fill: '#3b82f6', fontSize: 8, fontFamily: 'Arial, Helvetica, sans-serif', position: 'bottom' }} stroke="#3b82f6" strokeDasharray="3 3" />
                 
                 <Line 
                   type="monotone" 
                   dataKey="ACWR" 
-                  name="Current ACWR Quotient"
+                  name="ACWR Review Indicator"
                   stroke="#155EEF" 
                   strokeWidth={3} 
                   dot={{ r: 4 }} 

@@ -92,14 +92,14 @@ export default function PlatformTopbar({ role, onMenuClick }: PlatformTopbarProp
   const getHeaderInfo = (path: string) => {
     if (isCoach) {
       if (path === '/platform/coach') return { category: 'COACH DASHBOARD', title: 'Squad Performance Overview' };
-      if (path.includes('/new-session')) return { category: 'NEW SESSION', title: 'Configure Training Session' };
+      if (path.includes('/new-session')) return { category: 'NEW SESSION', title: 'Configure Session' };
       if (path.includes('/live-session')) return { category: 'Live Squad Tracking', title: 'Session Movement Tracking' };
       if (path.includes('/session-review')) return { category: 'POST-SESSION REVIEW', title: 'Post-Session Review' };
-      if (path.includes('/squad')) return { category: 'Squad Roster', title: 'Active Squad Roster' };
-      if (path.includes('/analytics')) return { category: 'ANALYTICS', title: 'Performance Analytics' };
+      if (path.includes('/squad')) return { category: 'SQUAD ANALYTICS', title: 'Squad Performance Analytics' };
+      if (path.includes('/analytics')) return { category: 'ADVANCED ANALYTICS', title: 'Performance Analytics' };
       if (path.includes('/benchmarking')) return { category: 'BENCHMARKING', title: 'Squad Fitness Benchmarking' };
       if (path.includes('/workload')) return { category: 'Squad Workload', title: 'Rolling Workload Index' };
-      if (path.includes('/readiness')) return { category: 'AVAILABILITY & READINESS', title: 'Availability & Session Readiness' };
+      if (path.includes('/readiness')) return { category: 'AVAILABILITY & PREPARATION', title: 'Availability & Session Preparation' };
       if (path.includes('/messages')) return { category: 'MESSAGES', title: 'Team Communications' };
       if (path.includes('/settings')) return { category: 'Settings', title: 'Preferences' };
       return { category: 'COACH PORTAL', title: 'SSP Coach Platform' };

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import NavigationProgress from "@/components/layout/NavigationProgress";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import "./globals.css";
 
@@ -14,8 +16,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <ThemeProvider>
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
           {children}
         </ThemeProvider>
       </body>

@@ -73,15 +73,17 @@ export default function BenchmarkingPage() {
       </div>
 
       {/* Cohort Selector Tabs */}
-      <div className="bg-zinc-50 border border-zinc-300 p-4 rounded-2xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-zinc-50 border border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 p-4 rounded-2xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
         
-        <div className="flex bg-zinc-100 p-1 rounded-xl border border-zinc-200 w-full sm:w-auto">
+        <div className="flex bg-zinc-100 dark:bg-zinc-950 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800 w-full sm:w-auto">
           {(['Forward', 'Midfielder', 'Defender'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`flex-1 sm:flex-initial px-6 py-2.5 text-xs font-extrabold rounded-lg transition-all cursor-pointer ${
-                activeTab === tab ? 'bg-zinc-800 text-white' : 'text-zinc-600 hover:text-zinc-800'
+                activeTab === tab 
+                  ? 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow' 
+                  : 'text-zinc-650 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'
               }`}
             >
               {tab}s ({mockPlayers.filter((p) => p.position === tab).length})
@@ -158,7 +160,7 @@ export default function BenchmarkingPage() {
                   return (
                     <tr key={player.id} className="hover:bg-zinc-100/40 transition-colors">
                       {/* Name */}
-                      <td className="py-4 pl-2 font-black text-white flex items-center space-x-3.5">
+                      <td className="py-4 pl-2 font-black text-zinc-950 dark:text-white flex items-center space-x-3.5">
                         <div className="h-7 w-7 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center font-bold text-[10px] text-brand-blue">
                           {player.squadNumber}
                         </div>
@@ -166,42 +168,42 @@ export default function BenchmarkingPage() {
                       </td>
 
                       {/* Distance */}
-                      <td className="py-4 text-right font-semibold text-zinc-800">{player.distance} m</td>
+                      <td className="py-4 text-right font-semibold text-zinc-850 dark:text-zinc-200">{player.distance} m</td>
                       <td className="py-4 text-right font-bold">
                         <span className={`px-2 py-0.5 rounded text-[10px] border ${
                           distDev.val >= 0.5
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                             : distDev.val <= -0.5
                             ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/20'
-                            : 'bg-zinc-800/40 text-zinc-600 border-zinc-300/40'
+                            : 'bg-zinc-800/40 text-zinc-500 dark:text-zinc-400 border-zinc-300/40'
                         }`}>
                           {distDev.text}
                         </span>
                       </td>
 
                       {/* Sprints */}
-                      <td className="py-4 text-right font-semibold text-zinc-800">{player.sprintCount}</td>
+                      <td className="py-4 text-right font-semibold text-zinc-850 dark:text-zinc-200">{player.sprintCount}</td>
                       <td className="py-4 text-right font-bold">
                         <span className={`px-2 py-0.5 rounded text-[10px] border ${
                           sprintDev.val >= 0.5
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                             : sprintDev.val <= -0.5
                             ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/20'
-                            : 'bg-zinc-800/40 text-zinc-600 border-zinc-300/40'
+                            : 'bg-zinc-800/40 text-zinc-500 dark:text-zinc-400 border-zinc-300/40'
                         }`}>
                           {sprintDev.text}
                         </span>
                       </td>
 
                       {/* Peak Velocity */}
-                      <td className="py-4 text-right font-semibold text-zinc-800">{player.maxSpeed} m/s</td>
+                      <td className="py-4 text-right font-semibold text-zinc-850 dark:text-zinc-200">{player.maxSpeed} m/s</td>
                       <td className="py-4 text-right font-bold pr-2">
                         <span className={`px-2 py-0.5 rounded text-[10px] border ${
                           speedDev.val >= 0.5
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                             : speedDev.val <= -0.5
                             ? 'bg-brand-blue/10 text-brand-blue border-brand-blue/20'
-                            : 'bg-zinc-800/40 text-zinc-600 border-zinc-300/40'
+                            : 'bg-zinc-800/40 text-zinc-500 dark:text-zinc-400 border-zinc-300/40'
                         }`}>
                           {speedDev.text}
                         </span>

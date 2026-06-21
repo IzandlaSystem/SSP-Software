@@ -15,11 +15,23 @@ import {
   Flame,
   ArrowRight
 } from 'lucide-react';
+import {
+  DEMO_ATHLETE_ID,
+  getActiveSessionForAthlete,
+  getDemoAthlete,
+  getLoadFlag,
+  getTargetForAthlete,
+  getTargetProgress,
+  mockGoals,
+  PlannedSessionConfig,
+} from '@/data';
 
 export default function AthleteDashboardPage() {
   const [devicePaired, setDevicePaired] = React.useState<boolean>(false);
   const [deviceDetails, setDeviceDetails] = React.useState<any>(null);
   const [hasUnsynced, setHasUnsynced] = React.useState<boolean>(false);
+  const [activeConfig, setActiveConfig] = React.useState<PlannedSessionConfig | null>(null);
+  const [lastSession, setLastSession] = React.useState<any>(null);
 
   React.useEffect(() => {
     // Read state from localStorage to create a highly integrated demo state
@@ -37,70 +49,99 @@ export default function AthleteDashboardPage() {
 
     const unsyncedSession = localStorage.getItem('ssp-unsynced-session');
     setHasUnsynced(!!unsyncedSession);
+
+    try {
+      setActiveConfig(getActiveSessionForAthlete(DEMO_ATHLETE_ID));
+      const last = localStorage.getItem('ssp-last-session');
+      setLastSession(last ? JSON.parse(last) : null);
+    } catch {
+      setActiveConfig(null);
+      setLastSession(null);
+    }
   }, []);
+
+  const demoAthlete = getDemoAthlete();
+  const isAssigned = !!(activeConfig && activeConfig.selectedPlayerIds?.includes(DEMO_ATHLETE_ID));
+  const activeTarget = getTargetForAthlete(isAssigned ? activeConfig : null, DEMO_ATHLETE_ID);
+  const loadFlag = getLoadFlag(demoAthlete);
+  const latestDistance = lastSession?.distanceMeters || demoAthlete.distance;
+  const latestSprints = lastSession?.sprints || demoAthlete.sprintCount;
+  const latestWorkload = Number(lastSession?.strain || demoAthlete.workload);
+  const latestMaxSpeed = Number(lastSession?.maxSpeed || demoAthlete.maxSpeed);
 
   // Quick statistics for performance summary
   const summaryStats = [
     {
-      label: 'Daily Target',
-      value: '78%',
-      subtitle: 'Session Limit',
-      desc: 'Optimal load zone reached',
+      label: 'Active Target',
+      value: `${getTargetProgress(latestDistance, activeTarget.distanceMeters)}%`,
+      subtitle: isAssigned ? activeConfig.title : 'No active coach plan',
+      desc: `${latestDistance} / ${activeTarget.distanceMeters} m`,
       icon: CheckCircle,
       color: 'text-emerald-700 bg-emerald-50 border border-emerald-200 dark:text-emerald-400 dark:bg-emerald-500/10 dark:border-emerald-500/20'
     },
     {
       label: 'Cumulative Dist.',
-      value: '6.2 km',
+      value: `${(latestDistance / 1000).toFixed(2)} km`,
       subtitle: 'Session Total',
-      desc: '+1.2km vs yesterday',
+      desc: `Target ${(activeTarget.distanceMeters / 1000).toFixed(1)} km`,
       icon: Compass,
       color: 'text-blue-700 bg-blue-50 border border-blue-200 dark:text-blue-400 dark:bg-blue-500/10 dark:border-blue-500/20'
     },
     {
       label: 'Speed Profile',
-      value: '8.2 m/s',
+      value: `${latestMaxSpeed.toFixed(1)} m/s`,
       subtitle: 'Max Speed',
-      desc: '96% of seasonal peak',
+      desc: `Target ${activeTarget.maxSpeedMps} m/s`,
       icon: Zap,
-      color: 'text-amber-700 bg-amber-50 border border-amber-200 dark:text-amber-400 dark:bg-amber-500/10 dark:border-amber-500/20'
+      color: 'text-amber-700 bg-amber-50 border border-amber-200 dark:text-amber-400 dark:bg-amber-500/10 dark:border-emerald-500/20'
     },
     {
       label: 'Workload Index',
-      value: '1.15',
-      subtitle: 'ACWR',
-      desc: 'Green zone',
+      value: String(latestWorkload),
+      subtitle: loadFlag.label,
+      desc: loadFlag.detail,
       icon: Gauge,
-      color: 'text-purple-700 bg-purple-50 border border-purple-200 dark:text-purple-400 dark:bg-purple-500/10 dark:border-purple-500/20'
+      color: 'text-purple-700 bg-purple-50 border border-purple-200 dark:text-purple-400 dark:bg-purple-500/10 dark:border-emerald-500/20'
     }
   ];
 
   // Goals list
   const activeGoals = [
     {
-      title: 'High Intensity Sprints',
-      current: 12,
-      target: 15,
-      unit: 'sprints (>6.5 m/s)',
-      pct: 80,
+      title: 'Distance Target',
+      current: latestDistance,
+      target: activeTarget.distanceMeters,
+      unit: 'm',
+      pct: getTargetProgress(latestDistance, activeTarget.distanceMeters),
+      color: 'bg-emerald-500'
+    },
+    {
+      title: 'Sprint Efforts',
+      current: latestSprints,
+      target: activeTarget.sprintCount,
+      unit: 'above threshold',
+      pct: getTargetProgress(latestSprints, activeTarget.sprintCount),
       color: 'bg-amber-500'
     },
     {
       title: 'Workload Target',
-      current: 412,
-      target: 500,
-      unit: 'workload points',
-      pct: 82,
+      current: latestWorkload,
+      target: activeTarget.workloadIndex,
+      unit: 'index',
+      pct: getTargetProgress(latestWorkload, activeTarget.workloadIndex),
       color: 'bg-brand-blue'
     },
-    {
-      title: 'Speed Zone Volume',
-      current: 2.8,
-      target: 4.0,
-      unit: 'km in zone 3+',
-      pct: 70,
-      color: 'bg-emerald-500'
-    }
+    ...mockGoals
+      .filter((goal) => goal.assignedTo === DEMO_ATHLETE_ID)
+      .slice(0, 1)
+      .map((goal) => ({
+        title: goal.title,
+        current: goal.currentValue,
+        target: goal.targetValue,
+        unit: goal.unit,
+        pct: getTargetProgress(goal.currentValue, goal.targetValue),
+        color: 'bg-zinc-500',
+      }))
   ];
 
   return (
@@ -238,13 +279,13 @@ export default function AthleteDashboardPage() {
 
             <div className="bg-zinc-100 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-850 p-4 rounded-xl space-y-3">
               <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed font-semibold italic">
-                "Alex, sprint metrics look solid. Keep the next session controlled and focus on clean stride rhythm. Today's target is a steady recovery session."
+                "{isAssigned ? (activeConfig?.coachNotes || 'No custom notes provided for this session.') : 'Coach targets are loaded for the active session. Review load flags as coaching prompts, not medical guidance.'}"
               </p>
-              <div className="flex items-center justify-between border-t border-zinc-200 dark:border-zinc-900 pt-2 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+              <div className="flex items-center justify-between border-t border-zinc-200 dark:border-zinc-900 pt-2 text-[10px] font-bold text-zinc-550 dark:text-zinc-450">
                 <span>By Dan (Head Coach)</span>
                 <span className="text-emerald-600 dark:text-emerald-450 flex items-center space-x-1">
                   <Flame className="h-3.5 w-3.5" />
-                  <span>Target: Recovery Session</span>
+                  <span>Target: {isAssigned && activeConfig?.sessionType === 'match' ? 'Match' : 'Training'} Session</span>
                 </span>
               </div>
             </div>

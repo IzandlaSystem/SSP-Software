@@ -11,11 +11,10 @@ import {
   Compass, 
   Activity, 
   AlertTriangle, 
-  Maximize2, 
   ArrowLeft,
-  Smartphone,
-  Gauge
+  Smartphone
 } from 'lucide-react';
+import { DEMO_ATHLETE_ID, getActiveSessionForAthlete, getTargetForAthlete, getTargetProgress, PlannedSessionConfig } from '@/data';
 
 export default function LiveSessionOverviewPage() {
   const router = useRouter();
@@ -30,12 +29,23 @@ export default function LiveSessionOverviewPage() {
   const [workloadStrain, setworkloadStrain] = React.useState<number>(0);
   const [maxSpeed, setMaxSpeed] = React.useState<number>(0);
   const [devicePaired, setDevicePaired] = React.useState<boolean>(false);
+  const [activeConfig, setActiveConfig] = React.useState<PlannedSessionConfig | null>(null);
   const latestSpeedRef = React.useRef(0);
+  const actualStartTimeRef = React.useRef<string | null>(null);
+
+  React.useEffect(() => {
+    router.prefetch('/platform/athlete/session-review');
+  }, [router]);
 
   // Check hardware pairing on load
   React.useEffect(() => {
     const isPaired = localStorage.getItem('ssp-device-connected') === 'true';
     setDevicePaired(isPaired);
+    try {
+      setActiveConfig(getActiveSessionForAthlete(DEMO_ATHLETE_ID));
+    } catch {
+      setActiveConfig(null);
+    }
   }, []);
 
   // Timer & Physics simulator interval
@@ -103,6 +113,9 @@ export default function LiveSessionOverviewPage() {
 
   // Controller Actions
   const handleStart = () => {
+    if (!actualStartTimeRef.current) {
+      actualStartTimeRef.current = new Date().toISOString();
+    }
     setIsActive(true);
     setIsPaused(false);
   };
@@ -113,13 +126,28 @@ export default function LiveSessionOverviewPage() {
   };
 
   const handleEnd = () => {
+    const target = getTargetForAthlete(activeConfig, DEMO_ATHLETE_ID);
+    const actualEndTime = new Date().toISOString();
     // Save session performance details to local storage
     const sessionSummary = {
+      athleteId: DEMO_ATHLETE_ID,
+      sessionId: activeConfig?.id,
+      title: activeConfig?.title || 'Athlete Live Session',
+      type: activeConfig?.sessionType || 'training',
+      sessionDate: activeConfig?.sessionDate,
+      plannedStartTime: activeConfig?.plannedStartTime,
+      plannedEndTime: activeConfig?.plannedEndTime,
+      plannedDurationMinutes: activeConfig?.plannedDurationMinutes,
+      actualStartTime: actualStartTimeRef.current || actualEndTime,
+      actualEndTime,
+      actualDurationMinutes: Math.floor(seconds / 60),
       durationSeconds: seconds,
       distance: (distance / 1000).toFixed(2), // store in km
+      distanceMeters: Math.round(distance),
       maxSpeed: maxSpeed > 0 ? maxSpeed.toFixed(1) : speed.toFixed(1),
       sprints: sprintCount,
       strain: workloadStrain.toFixed(0),
+      target,
       timestamp: new Date().toISOString()
     };
 
@@ -129,6 +157,7 @@ export default function LiveSessionOverviewPage() {
     // Redirect to review page
     router.push('/platform/athlete/session-review');
   };
+  const activeTarget = getTargetForAthlete(activeConfig, DEMO_ATHLETE_ID);
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-12 animate-in fade-in duration-300">
@@ -142,9 +171,9 @@ export default function LiveSessionOverviewPage() {
               <span>Dashboard</span>
             </Link>
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-zinc-950 mt-1">Live Session Feed</h1>
+          <h1 className="text-3xl font-black tracking-tight text-zinc-950 mt-1">{activeConfig?.title || 'Live Session Feed'}</h1>
           <p className="text-xs lg:text-sm text-zinc-600 font-medium">
-            High-contrast visual dashboard designed for real-time legibility under bright pitch sunlight.
+            Personal live activity with progress against coach-set targets.
           </p>
         </div>
 
@@ -211,7 +240,7 @@ export default function LiveSessionOverviewPage() {
               <span className="text-4xl lg:text-5xl font-black tracking-tight text-zinc-950 block">
                 {distance.toFixed(0)}
               </span>
-              <span className="text-[9px] font-bold text-zinc-500">METERS CLIMBING</span>
+              <span className="text-[9px] font-bold text-zinc-500">{getTargetProgress(distance, activeTarget.distanceMeters)}% OF DISTANCE TARGET</span>
             </div>
           </div>
 
@@ -225,7 +254,7 @@ export default function LiveSessionOverviewPage() {
               <span className="text-4xl lg:text-5xl font-black tracking-tight text-zinc-950 block">
                 {sprintCount}
               </span>
-              <span className="text-[9px] font-bold text-zinc-500">ACCELERATIVE RUNS (&gt;6.5 M/S)</span>
+              <span className="text-[9px] font-bold text-zinc-500">EFFORTS ABOVE CONFIGURED THRESHOLD</span>
             </div>
           </div>
 
@@ -239,7 +268,7 @@ export default function LiveSessionOverviewPage() {
               <span className="text-4xl lg:text-5xl font-black tracking-tight text-zinc-950 block">
                 {workloadStrain.toFixed(0)}
               </span>
-              <span className="text-[9px] font-bold text-zinc-500">ARBITRARY STRUCTURAL FORCE LOAD</span>
+              <span className="text-[9px] font-bold text-zinc-500">{getTargetProgress(workloadStrain, activeTarget.workloadIndex)}% OF WORKLOAD TARGET</span>
             </div>
           </div>
         </div>
@@ -252,7 +281,7 @@ export default function LiveSessionOverviewPage() {
           <div>
             <h4 className="text-xs font-black text-zinc-800">field-side Controls</h4>
             <p className="text-[10px] text-zinc-450 leading-relaxed mt-1 font-semibold">
-              Tap "Start Session" to connect live activity tracking. Ending your workout will automatically save your session summary and open the post-session review.
+              Tap "Start Session" to track personal activity. Ending the session saves a local target-vs-actual summary for review.
             </p>
           </div>
         </div>

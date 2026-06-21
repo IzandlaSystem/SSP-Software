@@ -59,13 +59,13 @@ export default function WorkloadPage() {
         <div>
           <div className="flex items-center space-x-2 text-brand-blue font-extrabold text-xs mb-1">
             <Icons.Gauge className="h-4 w-4" />
-            <span>Workload Strain dashboard</span>
+            <span>Workload review dashboard</span>
           </div>
           <h1 className="text-3xl font-black tracking-tight text-zinc-950">
             Acute : Chronic Workload Index
           </h1>
           <p className="text-sm text-zinc-600 mt-1">
-            Model workload load indices. Balance acute workload loops (7-day rolling) against fitness chronic baselines (28-day rolling).
+            Review workload indices. Compare acute workload (7-day rolling) against chronic workload baseline (28-day rolling).
           </p>
         </div>
       </div>
@@ -74,12 +74,12 @@ export default function WorkloadPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Sidebar Roster Selector with micro ACWR indicators */}
-        <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-5 shadow-xl space-y-4">
-          <div className="border-b border-zinc-200 pb-3">
-            <h3 className="font-extrabold text-sm text-zinc-800">
+        <div className="bg-zinc-50 border border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900 p-5 shadow-xl space-y-4">
+          <div className="border-b border-zinc-200 dark:border-zinc-800 pb-3">
+            <h3 className="font-extrabold text-sm text-zinc-800 dark:text-zinc-200">
               Roster ACWR Status
             </h3>
-            <p className="text-[10px] text-zinc-500 mt-0.5">Select player to load advanced rolling strain charts.</p>
+            <p className="text-[10px] text-zinc-500 mt-0.5">Select player to load rolling workload trend charts.</p>
           </div>
 
           <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
@@ -94,25 +94,29 @@ export default function WorkloadPage() {
                   onClick={() => setSelectedPlayerId(player.id)}
                   className={`w-full text-left p-3.5 rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-brand-blue/10 border-brand-blue text-white shadow shadow-red-500/5'
-                      : 'bg-zinc-100 border-zinc-300 hover:border-zinc-750 text-zinc-600'
+                      ? 'bg-brand-blue border-brand-blue text-white shadow shadow-red-500/5'
+                      : 'bg-zinc-100 dark:bg-zinc-950 border-zinc-350 dark:border-zinc-800 hover:border-zinc-500 text-zinc-650 dark:text-zinc-400'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
                     <div className={`h-8 w-8 rounded-full border flex items-center justify-center font-black text-xs transition-all ${
-                      isSelected ? 'bg-brand-blue/20 text-brand-blue border-brand-blue/35' : 'bg-zinc-50 text-zinc-500 border-zinc-200'
+                      isSelected 
+                        ? 'bg-white/20 text-white border-white/30' 
+                        : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-500 border-zinc-200 dark:border-zinc-800'
                     }`}>
                       {player.squadNumber}
                     </div>
                     <div>
-                      <h4 className="text-xs font-black text-zinc-800">{player.name}</h4>
-                      <span className="text-[9px] font-bold text-zinc-500">{player.position}</span>
+                      <h4 className={`text-xs font-black transition-colors ${isSelected ? 'text-white' : 'text-zinc-800 dark:text-zinc-250'}`}>{player.name}</h4>
+                      <span className={`text-[9px] font-bold transition-colors ${isSelected ? 'text-brand-blue-100/90' : 'text-zinc-500 dark:text-zinc-450'}`}>{player.position}</span>
                     </div>
                   </div>
                   
                   <span className={`text-[10px] font-black px-2 py-0.5 rounded border ${
-                    isOptimal
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                    isSelected
+                      ? 'bg-white/20 text-white border-white/30'
+                      : isOptimal
+                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                       : isHigh
                       ? 'bg-rose-500/10 text-rose-500 border-rose-500/20 animate-pulse'
                       : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
@@ -126,25 +130,25 @@ export default function WorkloadPage() {
         </div>
 
         {/* Rolling Load Chart and Stats Card */}
-        <div className="lg:col-span-2 bg-zinc-50 border border-zinc-200 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+        <div className="lg:col-span-2 bg-zinc-50 border border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900 p-6 shadow-xl flex flex-col justify-between">
           
           <div>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-200 pb-3.5 mb-5 gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3.5 mb-5 gap-3">
               <div className="flex items-center space-x-3">
-                <div className="h-9 w-9 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center font-extrabold text-xs text-brand-blue">
+                <div className="h-9 w-9 rounded-full bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center font-extrabold text-xs text-brand-blue">
                   #{selectedPlayer.squadNumber}
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-base text-zinc-800">
-                    {selectedPlayer.name} Strain Profile
+                  <h3 className="font-extrabold text-base text-zinc-800 dark:text-zinc-200">
+                    {selectedPlayer.name} Workload Review
                   </h3>
-                  <p className="text-xs text-zinc-500 mt-0.5">Rolling Acute (7d) vs Chronic (28d) workload loads.</p>
+                  <p className="text-xs text-zinc-500 mt-0.5">Rolling Acute (7d) vs Chronic (28d) workloads.</p>
                 </div>
               </div>
 
-              {/* Status Quotient */}
+              {/* Review Indicator */}
               <div className="text-right self-start sm:self-center">
-                <span className="text-[10px] font-bold text-zinc-500 block">ACWR Status Quotient</span>
+                <span className="text-[10px] font-bold text-zinc-500 block">ACWR Review Indicator</span>
                 <span className={`text-lg font-black border px-2.5 py-0.5 rounded inline-block mt-1 ${
                   selectedPlayer.acwr >= 0.8 && selectedPlayer.acwr <= 1.3
                     ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
@@ -225,15 +229,21 @@ export default function WorkloadPage() {
             <div className="flex items-start space-x-2">
               <Icons.ShieldAlert className="h-4.5 w-4.5 text-zinc-600 mt-0.5" />
               <p className="leading-relaxed">
-                <span className="font-extrabold text-zinc-700">Acute Strain:</span> rolling 7-day average: {Math.round(chartData[6]['Acute (7d)'])} meters. Represents current short-term workload levels.
+                <span className="font-extrabold text-zinc-700">Acute workload:</span> rolling 7-day average: {Math.round(chartData[6]['Acute (7d)'])} meters. Represents current short-term workload levels.
               </p>
             </div>
             <div className="flex items-start space-x-2">
               <Icons.TrendingUp className="h-4.5 w-4.5 text-zinc-600 mt-0.5" />
               <p className="leading-relaxed">
-                <span className="font-extrabold text-zinc-700">Chronic strain:</span> rolling 28-day average: {Math.round(chartData[6]['Chronic (28d)'])} meters. Represents chronic baseline fitness.
+                <span className="font-extrabold text-zinc-700">Chronic workload baseline:</span> rolling 28-day average: {Math.round(chartData[6]['Chronic (28d)'])} meters. Represents chronic baseline fitness.
               </p>
             </div>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-zinc-200 text-center">
+            <p className="text-[10px] text-zinc-500 italic">
+              * ACWR thresholds represent demo-configured parameters for coaching review purposes and do not represent medical, diagnostic, or clinical injury thresholds.
+            </p>
           </div>
         </div>
       </div>

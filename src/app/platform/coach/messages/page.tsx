@@ -39,7 +39,7 @@ export default function MessagesPage() {
       unread: true,
       messages: [
         { id: '1-1', sender: 'contact', text: 'Hey Coach, I saw my ACWR is up to 1.62 in the overview dashboard today.', timestamp: '10:40 AM' },
-        { id: '1-2', sender: 'coach', text: 'Yes, Lucas. We noticed your chronic strain levels are hitting warning boundaries. How are your hamstrings feeling?', timestamp: '10:42 AM' },
+        { id: '1-2', sender: 'coach', text: 'Yes, Lucas. We noticed a rolling workload flag on your profile trend review. How is your physical preparation feeling?', timestamp: '10:42 AM' },
         { id: '1-3', sender: 'contact', text: 'A bit tight from Saturday\'s training match play. Should I skip tomorrow\'s high-speed repeats?', timestamp: '10:45 AM' }
       ]
     },
@@ -69,7 +69,7 @@ export default function MessagesPage() {
       lastTime: 'Yesterday',
       unread: false,
       messages: [
-        { id: '3-1', sender: 'contact', text: 'Dan, did you review the sessional logs from the high-velocity conditioning block?', timestamp: 'Yesterday' },
+        { id: '3-1', sender: 'contact', text: 'Dan, did you review the sessional logs from the high-speed running block?', timestamp: 'Yesterday' },
         { id: '3-2', sender: 'contact', text: 'The conditioning targets look solid for this week.', timestamp: 'Yesterday' }
       ]
     },
@@ -137,7 +137,7 @@ export default function MessagesPage() {
             Roster & Staff Messaging
           </h1>
           <p className="text-sm text-zinc-600 mt-1">
-            Maintain direct channels with athletes and assistant coaches. Synchronise subjective readiness reflections.
+            Maintain direct channels with athletes and assistant coaches. Synchronise subjective session preparation reflections.
           </p>
         </div>
       </div>
@@ -152,7 +152,7 @@ export default function MessagesPage() {
               <Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
               <input
                 type="text"
-                className="w-full bg-zinc-100 border border-zinc-200 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-brand-blue font-semibold"
+                className="w-full bg-zinc-100 border border-zinc-200 rounded-xl pl-9 pr-4 py-2 text-xs text-zinc-950 dark:text-white focus:outline-none focus:border-brand-blue font-semibold"
                 placeholder="Search conversations..."
               />
             </div>
@@ -185,7 +185,7 @@ export default function MessagesPage() {
                     </div>
                     <span className="text-[9px] text-zinc-500 font-medium block mt-0.5">{thread.role}</span>
                     <p className={`text-[10px] truncate mt-1 leading-normal ${
-                      thread.unread && !isSelected ? 'text-white font-extrabold' : 'text-zinc-600 font-semibold'
+                      thread.unread && !isSelected ? 'text-zinc-950 dark:text-zinc-200 font-extrabold' : 'text-zinc-600 font-semibold'
                     }`}>
                       {thread.lastMessage}
                     </p>
@@ -257,7 +257,7 @@ export default function MessagesPage() {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              className="flex-1 bg-zinc-100 border border-zinc-200 focus:border-brand-blue rounded-xl px-4 py-3 text-xs text-white focus:outline-none font-semibold"
+              className="flex-1 bg-zinc-100 border border-zinc-200 focus:border-brand-blue rounded-xl px-4 py-3 text-xs text-zinc-950 dark:text-white focus:outline-none font-semibold"
               placeholder={`Send message to ${activeThread.name.split(' ')[0]}...`}
             />
 

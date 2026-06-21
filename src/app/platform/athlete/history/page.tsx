@@ -176,7 +176,7 @@ export default function HistoryPage() {
       </div>
 
       {/* Filter Matrix Controls */}
-      <div className="bg-zinc-50 border border-zinc-200 rounded-3xl p-5 gap-4 flex flex-col md:flex-row md:items-center justify-between shadow">
+      <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 gap-4 flex flex-col md:flex-row md:items-center justify-between shadow">
         
         {/* Search */}
         <div className="relative flex-1 max-w-sm">
@@ -186,7 +186,7 @@ export default function HistoryPage() {
             placeholder="Search dates, drills..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-zinc-100 border border-zinc-300 rounded-xl text-xs font-semibold text-zinc-800 focus:outline-none focus:border-zinc-300 transition-all"
+            className="w-full pl-10 pr-4 py-2 bg-zinc-100 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl text-xs font-semibold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-300 transition-all"
           />
         </div>
 
@@ -201,7 +201,7 @@ export default function HistoryPage() {
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-3 py-2 bg-zinc-100 border border-zinc-300 rounded-xl text-xs font-bold text-zinc-350 focus:outline-none focus:border-zinc-300 transition-all cursor-pointer"
+            className="px-3 py-2 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-200 focus:outline-none focus:border-zinc-300 transition-all cursor-pointer"
           >
             <option value="All">All Drill Types</option>
             <option value="Pitch Conditioning">Pitch Conditioning</option>
@@ -214,7 +214,7 @@ export default function HistoryPage() {
           <select
             value={filterIntensity}
             onChange={(e) => setFilterIntensity(e.target.value)}
-            className="px-3 py-2 bg-zinc-100 border border-zinc-300 rounded-xl text-xs font-bold text-zinc-350 focus:outline-none focus:border-zinc-300 transition-all cursor-pointer"
+            className="px-3 py-2 bg-white dark:bg-zinc-955 border border-zinc-300 dark:border-zinc-800 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-200 focus:outline-none focus:border-zinc-300 transition-all cursor-pointer"
           >
             <option value="All">All Intensities</option>
             <option value="High">High</option>
