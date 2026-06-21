@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FFFFFF; /* White Canvas Background */
+  --background: #fa0000e1; /* White Canvas Background */
   --foreground: #0A0A0A; /* Black Typography */
   
   --zinc-50: #FFFFFF;
@@ -24,7 +24,7 @@
   --brand-navy: #0A0A0A;
   --brand-blue: #1D4ED8; /* Premium Accent Blue */
   --brand-cyan: #2563EB;
-  --surface-light: #FFFFFF;
+  --surface-light: #04a80499;
   --surface-muted: #F8F7F3;
   --surface-dark: #0A0A0A;
   --border-brand: #D9D9D6;
@@ -731,7 +731,7 @@ body {
 .dark .marketing-navbar {
   --marketing-nav-bg: rgba(7, 17, 31, 0.94);
   --marketing-nav-border: rgba(148, 163, 184, 0.22);
-  --marketing-nav-text: #F8FAFC;
+  --marketing-nav-text: #e30a0a;
   --marketing-nav-muted: #CBD5E1;
   --marketing-nav-hover: rgba(148, 163, 184, 0.14);
   --marketing-nav-active: #FFFFFF;
